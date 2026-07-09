@@ -14,13 +14,7 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const prefersReduced = useReducedMotion();
-  const [show3D, setShow3D] = useState(false);
-
-  useEffect(() => {
-    if (prefersReduced) return;
-    const id = setTimeout(() => setShow3D(true), 6000);
-    return () => clearTimeout(id);
-  }, [prefersReduced]);
+  const [show3D] = useState(true);
 
   useEffect(() => {
     if (prefersReduced) return;
