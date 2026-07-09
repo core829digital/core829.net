@@ -26,6 +26,21 @@ export const submit = action({
     if (!parsed.success) throw new Error(parsed.error.issues[0].message);
 
     const data = parsed.data;
+
+    const rateKey = `contact:${data.email.toLowerCase()}`;
+    const limits = await ctx.runQuery(api.auth.getRateLimits, { key: rateKey });
+    if (limits.length > 0) {
+      const e = limits[0];
+      const RATE_LIMIT_BLOCK_MS = 10 * 60 * 1000;
+      if (e.blockedUntil && e.blockedUntil > Date.now()) {
+        throw new Error("Too many messages. Please try again later.");
+      }
+      if (e.attempts >= 5) {
+        await ctx.runMutation(api.auth.recordFailedAttempt, { key: rateKey });
+        throw new Error("Too many messages. Please try again later.");
+      }
+    }
+    await ctx.runMutation(api.auth.recordFailedAttempt, { key: rateKey });
     const description = data.message || data.projectType || "No details provided";
 
     await ctx.runMutation(api.leads.create, {

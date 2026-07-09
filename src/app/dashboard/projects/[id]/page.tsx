@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import { useConvex, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import type { Doc, Id } from "../../../../../convex/_generated/dataModel";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 import { getSessionToken } from "@/lib/cookie";
 import { useToast } from "@/components/ui/Toast";
 
@@ -14,44 +14,50 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [user, setUser] = useState<Doc<"users"> | null>(null);
-  const [project, setProject] = useState<Doc<"projects"> | null>(null);
-  const [messages, setMessages] = useState<Doc<"projectMessages">[]>([]);
-  const [docs, setDocs] = useState<Doc<"projectDocuments">[]>([]);
-  const [loading, setLoading] = useState(true);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const user = useQuery(
+    api.profile.getProfile,
+    token && session ? { token, userId: session.userId } : "skip"
+  );
+  const projectId = params.id as Id<"projects">;
+  const project = useQuery(
+    api.projects.getById,
+    token && projectId ? { projectId, token } : "skip"
+  );
+  const messages = useQuery(
+    api.messages.list,
+    token && project ? { projectId: project._id, token } : "skip"
+  ) ?? [];
+  const docs = useQuery(
+    api.documents.list,
+    token && project ? { projectId: project._id, token } : "skip"
+  ) ?? [];
+
   const [msgText, setMsgText] = useState("");
   const [sending, setSending] = useState(false);
 
-  const projectId = params.id as Id<"projects">;
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const token = getSessionToken();
-        if (!token) { router.push("/login?redirect=/dashboard"); return; }
-
-        const session = await convex.query(api.auth.validateSession, { token });
-        if (!session) { router.push("/login?redirect=/dashboard"); return; }
-
-        const profile = await convex.query(api.profile.getProfile, { userId: session.userId as any });
-        if (profile) setUser(profile as any);
-
-        const proj = await convex.query(api.projects.getById, { projectId, token });
-        setProject(proj);
-
-        const allMsgs = await convex.query(api.messages.list, { projectId, token });
-        setMessages(allMsgs);
-
-        const allDocs = await convex.query(api.documents.list, { projectId, token });
-        setDocs(allDocs);
-      } catch {
-        toast("Failed to load project", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, [convex, router, projectId, toast]);
+  if (session === undefined || project === undefined) {
+    return (
+      <div className="pt-40 min-h-dvh flex items-center justify-center bg-paper text-ink">
+        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      </div>
+    );
+  }
+  if (session === null) {
+    router.push("/login?redirect=/dashboard");
+    return null;
+  }
+  if (project === null) {
+    return (
+      <div className="pt-40 min-h-dvh bg-paper text-ink">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <p className="text-ink/60">Project not found.</p>
+          <Link href="/dashboard" className="text-signal text-sm mt-4 inline-block">&larr; Dashboard</Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleSend = async () => {
     if (!msgText.trim() || !user || !project) return;
@@ -64,35 +70,15 @@ export default function ProjectDetailPage() {
         senderId: user._id,
         senderRole: "client",
         content: msgText.trim(),
+        token,
       });
       setMsgText("");
-      const updated = await convex.query(api.messages.list, { projectId: project._id, token });
-      setMessages(updated);
     } catch {
       toast("Failed to send message", "error");
     } finally {
       setSending(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="pt-40 min-h-dvh flex items-center justify-center bg-paper text-ink">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!project) {
-    return (
-      <div className="pt-40 min-h-dvh bg-paper text-ink">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <p className="text-ink/60">Project not found.</p>
-          <Link href="/dashboard" className="text-signal text-sm mt-4 inline-block">&larr; Dashboard</Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pt-40 min-h-dvh bg-paper text-ink">

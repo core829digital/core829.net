@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ConvexClient } from "convex/browser";
+import { api } from "@/../convex/_generated/api";
 import { ENV } from "@/lib/env";
 
 export async function GET(
@@ -15,6 +17,20 @@ export async function GET(
     const token = request.cookies.get("session_token")?.value;
     if (!token || token.length < 32) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const client = new ConvexClient(ENV.CONVEX_URL);
+    let allowed = false;
+    try {
+      allowed = await client.query(api.documents.checkStorageAccess, { storageId: id, token });
+    } catch {
+      allowed = false;
+    } finally {
+      client.close();
+    }
+
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const storageUrl = `${ENV.CONVEX_URL}/api/storage/${encodeURIComponent(id)}`;

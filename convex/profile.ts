@@ -3,13 +3,16 @@ import { mutation, query } from "./_generated/server";
 import { requireSession } from "./authHelpers";
 
 export const getProfile = query({
-  args: { userId: v.id("users") },
+  args: { token: v.string(), userId: v.optional(v.id("users")) },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
+    const caller = await requireSession(ctx, args.token);
+    const targetId = args.userId ?? caller._id;
+    if (caller.role !== "admin" && caller._id !== targetId) throw new Error("Forbidden");
+    const user = await ctx.db.get(targetId);
     if (!user) return null;
     const clientRecord = await ctx.db
       .query("clients")
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .filter((q) => q.eq(q.field("userId"), targetId))
       .first();
     const { passwordHash, ...safeUser } = user;
     return { ...safeUser, client: clientRecord ?? null };

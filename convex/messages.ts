@@ -28,19 +28,22 @@ export const send = mutation({
     senderId: v.id("users"),
     senderRole: v.union(v.literal("admin"), v.literal("client")),
     content: v.string(),
+    token: v.string(),
   },
   handler: async (ctx, args) => {
     const content = sanitize(args.content);
     if (content.length === 0) throw new Error("Message cannot be empty");
     if (content.length > 5000) throw new Error("Message too long");
 
+    const caller = await requireSession(ctx, args.token);
+    if (caller._id !== args.senderId && caller.role !== "admin") {
+      throw new Error("Forbidden");
+    }
+
     const project = await ctx.db.get(args.projectId);
     if (!project) throw new Error("Project not found");
 
-    const user = await ctx.db.get(args.senderId);
-    if (!user) throw new Error("Sender not found");
-
-    if (args.senderRole !== "admin" && project.clientUserId !== user._id) {
+    if (caller.role !== "admin" && project.clientUserId !== caller._id) {
       throw new Error("You can only send messages to your own projects");
     }
 

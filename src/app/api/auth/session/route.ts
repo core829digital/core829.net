@@ -10,13 +10,14 @@ function validateToken(token: unknown): token is string {
 function csrfCheck(request: Request): boolean {
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
-  if (!origin && !referer) return true;
+  if (!origin && !referer) return false;
   const known = [
     "http://localhost:3000",
+    "https://localhost:3000",
     process.env.NEXT_PUBLIC_SITE_URL,
     process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : undefined,
   ].filter(Boolean) as string[];
-  const check = (url: string) => known.some((k) => url.startsWith(k) || url.includes(".vercel.app/"));
+  const check = (url: string) => known.some((k) => url === k || url.startsWith(`${k}/`));
   if (origin && check(origin)) return true;
   if (referer && check(referer)) return true;
   return false;

@@ -66,14 +66,37 @@ export default function AdminProjects() {
     if (!msgInput.trim() || !selectedId) return;
     const session = await convex.query(api.auth.validateSession, { token });
     if (!session) return;
-    await sendMessage({ projectId: selectedId as any, senderId: session.userId as any, senderRole: "admin", content: msgInput.trim() });
-    setMsgInput("");
+    try {
+      await sendMessage({ projectId: selectedId as any, senderId: session.userId as any, senderRole: "admin", content: msgInput.trim(), token });
+      setMsgInput("");
+    } catch { toast("Failed to send message", "error"); }
   };
 
   const handleAddTimeline = async () => {
     if (!timelineInput.trim() || !selectedId) return;
-    await addTimeline({ projectId: selectedId as any, event: timelineInput.trim(), token });
-    setTimelineInput("");
+    try {
+      await addTimeline({ projectId: selectedId as any, event: timelineInput.trim(), token });
+      setTimelineInput("");
+    } catch { toast("Failed to add timeline event", "error"); }
+  };
+
+  const handleSavePrice = async () => {
+    if (!selectedId) return;
+    const n = priceInput === "" ? undefined : parseFloat(priceInput);
+    if (priceInput !== "" && (isNaN(n as number) || (n as number) < 0)) {
+      toast("Enter a valid price", "error");
+      return;
+    }
+    try {
+      await updateProject({ projectId: selectedId as any, token, price: n });
+    } catch { toast("Failed to save price", "error"); }
+  };
+
+  const handleSaveField = async (field: "iban" | "stage" | "status", value: string) => {
+    if (!selectedId) return;
+    try {
+      await updateProject({ projectId: selectedId as any, token, [field]: value } as any);
+    } catch { toast("Failed to save", "error"); }
   };
 
   const getClientName = (p: Doc<"projects">) => {
@@ -160,7 +183,7 @@ export default function AdminProjects() {
                     <input type="number" value={priceInput} onChange={(e) => setPriceInput(e.target.value)}
                       className="flex-1 bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none"
                     />
-                    <button onClick={() => updateProject({ projectId: selected._id, token, price: parseFloat(priceInput) })}
+                    <button onClick={handleSavePrice}
                       className="px-3 py-2 bg-signal text-ink text-xs font-mono rounded-xl hover:bg-signal-dim"
                     >Save</button>
                   </div>
@@ -171,7 +194,7 @@ export default function AdminProjects() {
                     <input type="text" value={ibanInput} onChange={(e) => setIbanInput(e.target.value)}
                       className="flex-1 bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none font-mono"
                     />
-                    <button onClick={() => updateProject({ projectId: selected._id, token, iban: ibanInput })}
+                    <button onClick={() => handleSaveField("iban", ibanInput)}
                       className="px-3 py-2 bg-signal text-ink text-xs font-mono rounded-xl hover:bg-signal-dim"
                     >Save</button>
                   </div>
@@ -185,16 +208,16 @@ export default function AdminProjects() {
                     <input type="text" value={stageInput} onChange={(e) => setStageInput(e.target.value)}
                       className="flex-1 bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none"
                     />
-                    <button onClick={() => updateProject({ projectId: selected._id, token, stage: stageInput })}
+                    <button onClick={() => handleSaveField("stage", stageInput)}
                       className="px-3 py-2 bg-signal text-ink text-xs font-mono rounded-xl hover:bg-signal-dim"
                     >Save</button>
                   </div>
                 </div>
                 <div>
                   <label className="text-xs font-mono text-ink/40 uppercase tracking-wider">Status</label>
-                  <select value={selected.status} onChange={(e) => updateProject({ projectId: selected._id, token, status: e.target.value as any })}
-                    className="mt-1 w-full bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none"
-                  >
+                    <select value={selected.status} onChange={(e) => handleSaveField("status", e.target.value)}
+                      className="mt-1 w-full bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none"
+                    >
                     {statuses.filter((s) => s !== "all").map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>

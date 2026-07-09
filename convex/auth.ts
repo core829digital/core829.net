@@ -1,8 +1,8 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { requireAdmin } from "./authHelpers";
 
-export const getUserByEmail = query({
+export const getUserByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db

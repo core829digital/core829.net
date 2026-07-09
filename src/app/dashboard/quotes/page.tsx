@@ -1,61 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import type { Doc } from "../../../../convex/_generated/dataModel";
+import { getSessionToken } from "@/lib/cookie";
 import { useToast } from "@/components/ui/Toast";
 
 export default function QuotesPage() {
-  const convex = useConvex();
   const router = useRouter();
   const { toast } = useToast();
-  const [user, setUser] = useState<Doc<"users"> | null>(null);
-  const [quotes, setQuotes] = useState<Doc<"quotes">[]>([]);
-  const [loading, setLoading] = useState(true);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const quotes = useQuery(api.quotes.list, token ? { token } : "skip") ?? [];
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const token = document.cookie
-          .split("; ")
-          .find((r) => r.startsWith("session_token_client="))
-          ?.split("=")[1];
-        if (!token) {
-          router.push("/login?redirect=/dashboard/quotes");
-          return;
-        }
-
-        const session = await convex.query(api.auth.validateSession, { token });
-        if (!session) {
-          router.push("/login?redirect=/dashboard/quotes");
-          return;
-        }
-
-        const profile = await convex.query(api.profile.getProfile, {
-          userId: session.userId as any,
-        });
-        if (profile) setUser(profile as any);
-
-        const userQuotes = await convex.query(api.quotes.list, { token });
-        setQuotes(userQuotes);
-      } catch {
-        toast("Failed to load quotes", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, [convex, router, toast]);
-
-  if (loading) {
+  if (session === undefined) {
     return (
       <div className="flex items-center justify-center py-40">
         <p className="text-ink/60 font-mono text-sm">Loading...</p>
       </div>
     );
+  }
+  if (session === null) {
+    router.push("/login?redirect=/dashboard/quotes");
+    return null;
   }
 
   return (

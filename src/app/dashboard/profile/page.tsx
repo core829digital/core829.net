@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import { useConvex, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Doc } from "../../../../convex/_generated/dataModel";
 import { useToast } from "@/components/ui/Toast";
@@ -12,49 +12,52 @@ export default function ProfilePage() {
   const convex = useConvex();
   const router = useRouter();
   const { toast } = useToast();
-  const [user, setUser] = useState<Doc<"users"> | null>(null);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const user = useQuery(
+    api.profile.getProfile,
+    token && session ? { token, userId: session.userId } : "skip"
+  ) as Doc<"users"> | null;
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const initialized = useRef(false);
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const token = document.cookie
-          .split("; ")
-          .find((r) => r.startsWith("session_token_client="))
-          ?.split("=")[1];
-        if (!token) {
-          router.push("/login?redirect=/dashboard/profile");
-          return;
-        }
+    if (user && !initialized.current) {
+      setName(user.name);
+      setCompany(user.company ?? "");
+      initialized.current = true;
+    }
+  }, [user]);
 
-        const session = await convex.query(api.auth.validateSession, { token });
-        if (!session) {
-          router.push("/login?redirect=/dashboard/profile");
-          return;
-        }
-
-        const profile = await convex.query(api.profile.getProfile, {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          userId: session.userId as any,
-        });
-        if (profile) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setUser(profile as any);
-          setName(profile.name);
-          setCompany(profile.company ?? "");
-        }
-      } catch {
-        toast("Failed to load profile", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, [convex, router, toast]);
+  if (session === undefined || user === undefined) {
+    return (
+      <div className="flex items-center justify-center py-40">
+        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      </div>
+    );
+  }
+  if (session === null) {
+    router.push("/login?redirect=/dashboard/profile");
+    return null;
+  }
+  if (user === null) {
+    return (
+      <div className="flex items-center justify-center py-40">
+        <div className="text-center">
+          <p className="text-ink/60 font-mono text-sm">Could not load profile.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-5 py-2.5 bg-signal text-ink text-xs font-mono uppercase tracking-wider rounded-full hover:bg-signal-dim transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSave = async () => {
     if (!user) return;
@@ -76,30 +79,6 @@ export default function ProfilePage() {
       setSaving(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-40">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center py-40">
-        <div className="text-center">
-          <p className="text-ink/60 font-mono text-sm">Could not load profile.</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-5 py-2.5 bg-signal text-ink text-xs font-mono uppercase tracking-wider rounded-full hover:bg-signal-dim transition-colors"
-          >
-            Try again
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-[640px] mx-auto px-6 py-8">

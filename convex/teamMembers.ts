@@ -12,8 +12,9 @@ export const list = query({
 });
 
 export const getByEmail = query({
-  args: { email: v.string() },
+  args: { email: v.string(), token: v.string() },
   handler: async (ctx, args) => {
+    await requireSession(ctx, args.token);
     return await ctx.db
       .query("teamMembers")
       .withIndex("by_email", (q) => q.eq("email", args.email))

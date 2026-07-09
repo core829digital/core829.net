@@ -43,6 +43,7 @@ export default function AdminQuotes() {
         title: newTitle,
         amount: newAmount ? parseFloat(newAmount) : undefined,
         currency: "EUR",
+        token,
       });
       setNewUserId(""); setNewTitle(""); setNewAmount(""); setShowCreate(false);
     } catch { toast("Failed to create quote", "error"); }

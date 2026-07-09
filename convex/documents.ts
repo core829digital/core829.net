@@ -50,3 +50,30 @@ export const remove = mutation({
     await ctx.db.delete(args.id);
   },
 });
+
+export const checkStorageAccess = query({
+  args: { storageId: v.string(), token: v.string() },
+  handler: async (ctx, args) => {
+    const user = await requireSession(ctx, args.token);
+    if (user.role === "admin") return true;
+
+    const doc = await ctx.db
+      .query("projectDocuments")
+      .filter((q) => q.eq(q.field("storageId"), args.storageId))
+      .first();
+    if (doc) {
+      const project = await ctx.db.get(doc.projectId);
+      return !!project && project.clientUserId === user._id;
+    }
+
+    const quote = await ctx.db
+      .query("quotes")
+      .filter((q) => q.eq(q.field("pdfStorageId"), args.storageId))
+      .first();
+    if (quote) {
+      return quote.userId === user._id;
+    }
+
+    return false;
+  },
+});

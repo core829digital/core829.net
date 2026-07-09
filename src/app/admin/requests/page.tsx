@@ -47,6 +47,7 @@ export default function AdminRequests() {
         title,
         amount: undefined,
         currency: "EUR",
+        token,
       });
       await updateStatus({ id: req._id, status: "quoted", token });
       setQuoteTitle("");

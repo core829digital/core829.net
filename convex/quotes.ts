@@ -24,8 +24,11 @@ export const create = mutation({
     description: v.optional(v.string()),
     amount: v.optional(v.number()),
     currency: v.string(),
+    token: v.string(),
   },
   handler: async (ctx, args) => {
+    const caller = await requireSession(ctx, args.token);
+    if (caller.role !== "admin" && caller._id !== args.userId) throw new Error("Forbidden");
     return await ctx.db.insert("quotes", {
       userId: args.userId,
       projectRequestId: args.projectRequestId,
@@ -49,14 +52,12 @@ export const updatePrice = mutation({
 });
 
 export const updateStatus = mutation({
-  args: { quoteId: v.id("quotes"), status: v.union(v.literal("draft"), v.literal("sent"), v.literal("accepted"), v.literal("rejected")), token: v.optional(v.string()) },
+  args: { quoteId: v.id("quotes"), status: v.union(v.literal("draft"), v.literal("sent"), v.literal("accepted"), v.literal("rejected")), token: v.string() },
   handler: async (ctx, args) => {
     const quote = await ctx.db.get(args.quoteId);
     if (!quote) throw new Error("Quote not found");
-    if (args.token) {
-      const user = await requireSession(ctx, args.token);
-      if (user.role !== "admin" && quote.userId !== user._id) throw new Error("Forbidden");
-    }
+    const user = await requireSession(ctx, args.token);
+    if (user.role !== "admin" && quote.userId !== user._id) throw new Error("Forbidden");
     await ctx.db.patch(args.quoteId, { status: args.status, updatedAt: Date.now() });
   },
 });

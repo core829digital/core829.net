@@ -56,7 +56,7 @@ export function FlowMapSection() {
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=2000",
+          end: "bottom bottom",
           scrub: 1.5,
           onUpdate: () => {
             const activeIndex = Math.min(Math.floor(progress.value * totalLength), totalLength - 1);

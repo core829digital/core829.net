@@ -82,7 +82,7 @@ export function StackedServices() {
         <div className="grid-12 mb-12">
           <div className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">What we actually do</span>
-            <h2 className="text-display text-3xl md:text-6xl tracking-tight mt-3">Six capabilities.<br />One partner.</h2>
+            <h2 className="text-display text-3xl md:text-6xl tracking-tight mt-3">Seven capabilities.<br />One partner.</h2>
           </div>
         </div>
       </div>

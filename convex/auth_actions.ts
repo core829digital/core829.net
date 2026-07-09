@@ -3,7 +3,7 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
 import type { ActionCtx } from "./_generated/server";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import crypto from "crypto";
 import { signupSchema, loginSchema, passwordResetSchema, confirmResetSchema } from "./validation";
 
@@ -70,7 +70,7 @@ export const signup = action({
       throw new Error("Too many attempts. Try again later.");
     }
 
-    const existing = await callQuery(ctx, api.auth.getUserByEmail, { email: parsed.data.email });
+    const existing = await callQuery(ctx, internal.auth.getUserByEmail, { email: parsed.data.email });
     if (existing) {
       await callMutation(ctx, api.auth.recordFailedAttempt, { key });
       throw new Error("Email already registered");
@@ -112,7 +112,7 @@ export const login = action({
         throw new Error("Too many attempts. Try again later.");
     }
 
-    const user = await callQuery(ctx, api.auth.getUserByEmail, {
+    const user = await callQuery(ctx, internal.auth.getUserByEmail, {
       email: parsed.data.email,
     });
     if (!user) {
@@ -152,7 +152,20 @@ export const requestPasswordReset = action({
     const parsed = passwordResetSchema.safeParse(args);
     if (!parsed.success) return { success: true };
 
-    const user = await callQuery(ctx, api.auth.getUserByEmail, {
+    const key = `reset:${parsed.data.email.toLowerCase()}`;
+    const limits = await callQuery(ctx, api.auth.getRateLimits, { key });
+    if (limits.length > 0) {
+      const e = limits[0];
+      if (e.blockedUntil && e.blockedUntil > Date.now()) {
+        return { success: true };
+      }
+      if (e.attempts >= 3) {
+        return { success: true };
+      }
+    }
+    await callMutation(ctx, api.auth.recordFailedAttempt, { key });
+
+    const user = await callQuery(ctx, internal.auth.getUserByEmail, {
       email: parsed.data.email,
     });
     if (!user) return { success: true };

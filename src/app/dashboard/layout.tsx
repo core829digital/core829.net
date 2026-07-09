@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import Link from "next/link";
+import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
 
@@ -17,25 +16,26 @@ const NAV = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const convex = useConvex();
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
-
-  useEffect(() => {
-    const check = async () => {
-      const token = getSessionToken();
-      if (!token) { router.push("/login?redirect=/dashboard"); return; }
-      const session = await convex.query(api.auth.validateSession, { token });
-      if (!session) { router.push("/login?redirect=/dashboard"); return; }
-      const profile = await convex.query(api.profile.getProfile, { userId: session.userId as any });
-      if (profile) setUser(profile as any);
-    };
-    check();
-  }, [convex, router]);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const user = useQuery(
+    api.profile.getProfile,
+    token && session ? { token, userId: session.userId } : "skip"
+  );
 
   const handleLogout = async () => {
     await fetch("/api/auth/session", { method: "DELETE" });
     router.push("/");
   };
+
+  if (session === null) {
+    router.push("/login?redirect=/dashboard");
+    return null;
+  }
+  if (session && user === null) {
+    router.push("/login?redirect=/dashboard");
+    return null;
+  }
 
   return (
     <div className="pt-28 min-h-dvh bg-paper text-ink flex">

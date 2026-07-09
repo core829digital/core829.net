@@ -1,59 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import type { Doc } from "../../../convex/_generated/dataModel";
 import { getSessionToken } from "@/lib/cookie";
 import { useToast } from "@/components/ui/Toast";
 
 export default function DashboardPage() {
-  const convex = useConvex();
   const router = useRouter();
   const { toast } = useToast();
-  const [user, setUser] = useState<Doc<"users"> | null>(null);
-  const [projects, setProjects] = useState<Doc<"projects">[]>([]);
-  const [quotes, setQuotes] = useState<Doc<"quotes">[]>([]);
-  const [loading, setLoading] = useState(true);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const user = useQuery(
+    api.profile.getProfile,
+    token && session ? { token, userId: session.userId } : "skip"
+  );
+  const projects = useQuery(
+    api.projects.getByUser,
+    token && session ? { userId: session.userId, token } : "skip"
+  ) ?? [];
+  const quotes = useQuery(api.quotes.list, token ? { token } : "skip") ?? [];
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const token = getSessionToken();
-        if (!token) { router.push("/login?redirect=/dashboard"); return; }
-
-        const session = await convex.query(api.auth.validateSession, { token });
-        if (!session) { router.push("/login?redirect=/dashboard"); return; }
-
-        const profile = await convex.query(api.profile.getProfile, { userId: session.userId as any });
-        if (profile) setUser(profile as any);
-
-        const [userProjects, userQuotes] = await Promise.all([
-          convex.query(api.projects.getByUser, { userId: session.userId as any, token }),
-          convex.query(api.quotes.list, { token }),
-        ]);
-        setProjects(userProjects);
-        setQuotes(userQuotes);
-      } catch { toast("Failed to load dashboard", "error"); }
-      setLoading(false);
-    };
-    init();
-  }, [convex, router, toast]);
-
-  const handleLogout = async () => {
-    await fetch("/api/auth/session", { method: "DELETE" });
-    router.push("/");
-  };
-
-  if (loading) {
+  if (session === undefined) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <p className="text-ink/60 font-mono text-sm">Loading...</p>
       </div>
     );
   }
+  if (session === null) {
+    router.push("/login?redirect=/dashboard");
+    return null;
+  }
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/session", { method: "DELETE" });
+    router.push("/");
+  };
 
   const activeProjects = projects.filter((p) => p.status !== "support");
   const pendingQuotes = quotes.filter((q) => q.status === "sent" || q.status === "draft");

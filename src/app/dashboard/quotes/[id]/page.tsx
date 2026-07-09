@@ -3,9 +3,9 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import { useConvex, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import type { Doc, Id } from "../../../../../convex/_generated/dataModel";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 import { getSessionToken } from "@/lib/cookie";
 import { useToast } from "@/components/ui/Toast";
 
@@ -14,69 +14,62 @@ export default function QuoteDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [user, setUser] = useState<Doc<"users"> | null>(null);
-  const [quote, setQuote] = useState<Doc<"quotes"> | null>(null);
-  const [project, setProject] = useState<Doc<"projects"> | null>(null);
-  const [messages, setMessages] = useState<Doc<"projectMessages">[]>([]);
-  const [docs, setDocs] = useState<Doc<"projectDocuments">[]>([]);
-  const [loading, setLoading] = useState(true);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const user = useQuery(
+    api.profile.getProfile,
+    token && session ? { token, userId: session.userId } : "skip"
+  );
+  const quoteId = params.id as Id<"quotes">;
+  const quote = useQuery(
+    api.quotes.get,
+    token && quoteId ? { quoteId, token } : "skip"
+  );
+  const userProjects = useQuery(
+    api.projects.getByUser,
+    token && session ? { userId: session.userId, token } : "skip"
+  ) ?? [];
+  const project = userProjects[0] ?? null;
+  const messages = useQuery(
+    api.messages.list,
+    token && project ? { projectId: project._id, token } : "skip"
+  ) ?? [];
+  const docs = useQuery(
+    api.documents.list,
+    token && project ? { projectId: project._id, token } : "skip"
+  ) ?? [];
+
   const [msgText, setMsgText] = useState("");
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const quoteId = params.id as Id<"quotes">;
-
-  useEffect(() => {
-    const token = getSessionToken();
-    if (!token) {
-      router.push("/login?redirect=/dashboard/quotes/" + quoteId);
-      return;
-    }
-
-    const init = async () => {
-      try {
-        const session = await convex.query(api.auth.validateSession, { token });
-        if (!session) {
-          router.push("/login?redirect=/dashboard/quotes/" + quoteId);
-          return;
-        }
-
-        const profile = await convex.query(api.profile.getProfile, {
-          userId: session.userId as any,
-        });
-        if (profile) setUser(profile as any);
-
-        const q = await convex.query(api.quotes.get, { quoteId, token });
-        setQuote(q);
-
-        const userProjects = await convex.query(api.projects.getByUser, {
-          userId: session.userId as any,
-          token,
-        });
-
-        const proj = userProjects[0] ?? null;
-        setProject(proj);
-
-        if (proj) {
-          const [allMsgs, allDocs] = await Promise.all([
-            convex.query(api.messages.list, { projectId: proj._id, token }),
-            convex.query(api.documents.list, { projectId: proj._id, token }),
-          ]);
-          setMessages(allMsgs);
-          setDocs(allDocs);
-        }
-      } catch {
-        toast("Failed to load quote", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, [convex, router, quoteId, toast]);
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  if (session === undefined || quote === undefined) {
+    return (
+      <div className="pt-40 min-h-dvh flex items-center justify-center bg-paper text-ink">
+        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      </div>
+    );
+  }
+  if (session === null) {
+    router.push("/login?redirect=/dashboard/quotes/" + quoteId);
+    return null;
+  }
+  if (quote === null) {
+    return (
+      <div className="pt-40 min-h-dvh bg-paper text-ink">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <p className="text-ink/60">Preventivo non trovato.</p>
+          <Link href="/dashboard/quotes" className="text-signal text-sm mt-4 inline-block">
+            &larr; Torna ai preventivi
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleSend = async () => {
     if (!msgText.trim() || !user || !project) return;
@@ -89,10 +82,9 @@ export default function QuoteDetailPage() {
         senderId: user._id,
         senderRole: "client",
         content: msgText.trim(),
+        token,
       });
       setMsgText("");
-      const updated = await convex.query(api.messages.list, { projectId: project._id, token });
-      setMessages(updated);
     } catch {
       toast("Failed to send message", "error");
     } finally {
@@ -101,7 +93,6 @@ export default function QuoteDetailPage() {
   };
 
   const handleAcceptQuote = async () => {
-    if (!quote) return;
     try {
       const token = getSessionToken();
       if (!token) return;
@@ -110,14 +101,12 @@ export default function QuoteDetailPage() {
         status: "accepted",
         token,
       });
-      setQuote({ ...quote, status: "accepted" });
     } catch {
       toast("Failed to accept quote", "error");
     }
   };
 
   const handleRejectQuote = async () => {
-    if (!quote) return;
     try {
       const token = getSessionToken();
       if (!token) return;
@@ -126,32 +115,10 @@ export default function QuoteDetailPage() {
         status: "rejected",
         token,
       });
-      setQuote({ ...quote, status: "rejected" });
     } catch {
       toast("Failed to reject quote", "error");
     }
   };
-
-  if (loading) {
-    return (
-      <div className="pt-40 min-h-dvh flex items-center justify-center bg-paper text-ink">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!quote) {
-    return (
-      <div className="pt-40 min-h-dvh bg-paper text-ink">
-        <div className="max-w-[1440px] mx-auto px-6">
-          <p className="text-ink/60">Preventivo non trovato.</p>
-          <Link href="/dashboard/quotes" className="text-signal text-sm mt-4 inline-block">
-            &larr; Torna ai preventivi
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const statusLabel: Record<string, string> = {
     draft: "Bozza",
