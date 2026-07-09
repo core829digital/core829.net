@@ -12,6 +12,9 @@ export const submit = action({
     name: v.string(),
     email: v.string(),
     company: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    phoneCountryCode: v.optional(v.string()),
+    clientType: v.optional(v.union(v.literal("company"), v.literal("private"))),
     serviceInterest: v.string(),
     budget: v.optional(v.string()),
     timeline: v.optional(v.string()),
@@ -29,6 +32,9 @@ export const submit = action({
       name: data.name,
       email: data.email,
       company: data.company,
+      phone: data.phone,
+      phoneCountryCode: data.phoneCountryCode,
+      clientType: data.clientType,
       serviceInterest: data.serviceInterest,
       message: data.message,
     });
@@ -38,6 +44,9 @@ export const submit = action({
       name: data.name,
       email: data.email,
       company: data.company,
+      phone: data.phone,
+      phoneCountryCode: data.phoneCountryCode,
+      clientType: data.clientType,
       serviceInterest: data.serviceInterest,
       budget: data.budget,
       timeline: data.timeline,
@@ -58,7 +67,9 @@ export const submit = action({
             <table style="border-collapse:collapse;width:100%;max-width:600px;">
               <tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Name</td><td style="padding:8px 12px;border:1px solid #ddd;">${data.name}</td></tr>
               <tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Email</td><td style="padding:8px 12px;border:1px solid #ddd;"><a href="mailto:${data.email}">${data.email}</a></td></tr>
+              ${data.clientType ? `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Client type</td><td style="padding:8px 12px;border:1px solid #ddd;">${data.clientType}</td></tr>` : ""}
               ${data.company ? `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Company</td><td style="padding:8px 12px;border:1px solid #ddd;">${data.company}</td></tr>` : ""}
+              ${data.phone ? `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Phone</td><td style="padding:8px 12px;border:1px solid #ddd;">${data.phoneCountryCode ? data.phoneCountryCode + " " : ""}${data.phone}</td></tr>` : ""}
               <tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Service interest</td><td style="padding:8px 12px;border:1px solid #ddd;">${serviceName}</td></tr>
               ${data.budget ? `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Budget</td><td style="padding:8px 12px;border:1px solid #ddd;">${data.budget}</td></tr>` : ""}
               ${data.timeline ? `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Timeline</td><td style="padding:8px 12px;border:1px solid #ddd;">${data.timeline}</td></tr>` : ""}

@@ -2,6 +2,13 @@ import { z } from "zod";
 
 export const emailSchema = z.string().email().max(255).transform((v) => v.toLowerCase().trim());
 
+export const phoneSchema = z
+  .string()
+  .min(7, "Phone number must be at least 7 digits")
+  .max(20)
+  .regex(/^[\d\s\+\-\(\)]+$/, "Invalid phone number format")
+  .optional();
+
 export const signupSchema = z.object({
   email: emailSchema,
   password: z.string().min(8, "Password must be at least 8 characters").max(128),
@@ -17,6 +24,9 @@ export const createLeadSchema = z.object({
   name: z.string().min(1).max(200).trim(),
   email: emailSchema,
   company: z.string().max(200).trim().optional(),
+  phone: phoneSchema,
+  phoneCountryCode: z.string().max(5).optional(),
+  clientType: z.enum(["company", "private"]).optional(),
   serviceInterest: z.string().min(1).max(100),
   message: z.string().max(5000).trim().optional(),
 });
@@ -25,6 +35,9 @@ export const createProjectRequestSchema = z.object({
   name: z.string().min(1).max(200).trim(),
   email: emailSchema,
   company: z.string().max(200).trim().optional(),
+  phone: phoneSchema,
+  phoneCountryCode: z.string().max(5).optional(),
+  clientType: z.enum(["company", "private"]).optional(),
   serviceInterest: z.string().min(1).max(100),
   budget: z.string().max(100).optional(),
   timeline: z.string().max(100).optional(),
@@ -36,6 +49,9 @@ export const contactSubmitSchema = z.object({
   name: z.string().min(1).max(200).trim(),
   email: emailSchema,
   company: z.string().max(200).trim().optional(),
+  phone: phoneSchema,
+  phoneCountryCode: z.string().max(5).optional(),
+  clientType: z.enum(["company", "private"]).optional(),
   serviceInterest: z.string().min(1).max(100),
   budget: z.string().max(100).optional(),
   timeline: z.string().max(100).optional(),

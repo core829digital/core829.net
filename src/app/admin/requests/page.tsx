@@ -95,12 +95,15 @@ export default function AdminRequests() {
                     "bg-red-500/10 text-red-400"
                   }`}>{req.status}</span>
                 </div>
-                <p className="text-sm text-ink/60">{req.email} {req.company ? `· ${req.company}` : ""} · {req.serviceInterest}</p>
-                {req.description && <p className="text-sm text-ink/50 mt-2 bg-paper rounded-xl p-3">{req.description}</p>}
-                <div className="flex gap-4 mt-2 text-xs text-ink/40">
+                <p className="text-sm text-ink/60">{req.email} {req.company ? `· ${req.company}` : ""}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-ink/40">
+                  <span>Service: {req.serviceInterest}</span>
+                  {req.clientType && <span>Type: {req.clientType}</span>}
+                  {req.phone && <span>Phone: {req.phoneCountryCode ? `${req.phoneCountryCode} ` : ""}{req.phone}</span>}
                   {req.budget && <span>Budget: {req.budget}</span>}
                   {req.timeline && <span>Timeline: {req.timeline}</span>}
                 </div>
+                {req.description && <p className="text-sm text-ink/50 mt-2 bg-paper rounded-xl p-3">{req.description}</p>}
               </div>
               <div className="flex flex-col gap-2 shrink-0">
                 <select value={req.status} onChange={(e) => updateStatus({ id: req._id, status: e.target.value as any, token })}

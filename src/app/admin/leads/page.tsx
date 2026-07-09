@@ -34,6 +34,9 @@ export default function AdminLeads() {
         name: lead.name,
         email: lead.email,
         company: lead.company ?? undefined,
+        phone: lead.phone ?? undefined,
+        phoneCountryCode: lead.phoneCountryCode ?? undefined,
+        clientType: lead.clientType ?? undefined,
         serviceInterest: lead.serviceInterest,
         description: lead.message ?? "",
       });
@@ -83,7 +86,11 @@ export default function AdminLeads() {
                 }`}>{lead.status}</span>
               </div>
               <p className="text-sm text-ink/60">{lead.email} {lead.company ? `· ${lead.company}` : ""}</p>
-              <p className="text-xs text-ink/40 mt-1">Service: {lead.serviceInterest}</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-ink/40">
+                <span>Service: {lead.serviceInterest}</span>
+                {lead.clientType && <span>Type: {lead.clientType}</span>}
+                {lead.phone && <span>Phone: {lead.phoneCountryCode ? `${lead.phoneCountryCode} ` : ""}{lead.phone}</span>}
+              </div>
               {lead.message && <p className="text-sm text-ink/50 mt-2 bg-paper rounded-xl p-3">{lead.message}</p>}
               <p className="text-xs text-ink/30 mt-2 font-mono">ID: {lead._id}</p>
             </div>
