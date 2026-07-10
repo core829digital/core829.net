@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
+import { useToast } from "@/components/ui/Toast";
 
 export default function AdminApps() {
   const token = getSessionToken();
@@ -11,6 +12,7 @@ export default function AdminApps() {
   const create = useMutation(api.rentableApps.create);
   const update = useMutation(api.rentableApps.update);
   const remove = useMutation(api.rentableApps.remove);
+  const { toast } = useToast();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState("");
@@ -58,18 +60,22 @@ export default function AdminApps() {
           <div className="flex gap-2">
             <button onClick={async () => {
               if (!newName || !newSlug || !newCategory || !newPrice) return;
-              await create({
-                name: newName.trim(),
-                slug: newSlug.trim(),
-                category: newCategory.trim(),
-                tagline: newTagline.trim(),
-                description: newDesc.trim(),
-                monthlyPrice: parseFloat(newPrice),
-                features: newFeatures.split(",").map((f) => f.trim()).filter(Boolean),
-                active: true,
-                token,
-              });
-              setNewName(""); setNewSlug(""); setNewCategory(""); setNewTagline(""); setNewDesc(""); setNewPrice(""); setNewFeatures(""); setShowCreate(false);
+              const priceVal = parseFloat(newPrice);
+              if (isNaN(priceVal) || priceVal < 0) { toast("Enter a valid price", "error"); return; }
+              try {
+                await create({
+                  name: newName.trim(),
+                  slug: newSlug.trim(),
+                  category: newCategory.trim(),
+                  tagline: newTagline.trim(),
+                  description: newDesc.trim(),
+                  monthlyPrice: priceVal,
+                  features: newFeatures.split(",").map((f) => f.trim()).filter(Boolean),
+                  active: true,
+                  token,
+                });
+                setNewName(""); setNewSlug(""); setNewCategory(""); setNewTagline(""); setNewDesc(""); setNewPrice(""); setNewFeatures(""); setShowCreate(false);
+              } catch { toast("Failed to create app", "error"); }
             }} className="px-4 py-2 bg-signal text-ink text-xs font-mono uppercase tracking-wider rounded-full hover:bg-signal-dim transition-colors">Create</button>
           </div>
         </div>
@@ -93,7 +99,11 @@ export default function AdminApps() {
                   <option value="true">Active</option>
                   <option value="false">Inactive</option>
                 </select>
-                <button onClick={async () => { await update({ id: a._id, token, monthlyPrice: parseFloat(editPrice), active: editActive }); setEditingId(null); }}
+                <button onClick={async () => {
+                  const priceVal = parseFloat(editPrice);
+                  if (isNaN(priceVal) || priceVal < 0) { toast("Enter a valid price", "error"); return; }
+                  try { await update({ id: a._id, token, monthlyPrice: priceVal, active: editActive }); setEditingId(null); } catch { toast("Failed to save", "error"); }
+                }}
                   className="px-3 py-1.5 bg-signal text-ink text-xs font-mono rounded-xl">Save</button>
                 <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-xs font-mono text-ink/40">Cancel</button>
               </div>
@@ -109,7 +119,7 @@ export default function AdminApps() {
                   </span>
                   <button onClick={() => { setEditingId(a._id); setEditPrice(a.monthlyPrice.toString()); setEditActive(a.active); }}
                     className="text-xs text-ink/40 hover:text-ink font-mono">Edit</button>
-                  <button onClick={() => { if (confirm("Delete app?")) remove({ id: a._id, token }); }}
+                  <button onClick={async () => { if (confirm("Delete app?")) { try { await remove({ id: a._id, token }); } catch { toast("Failed to delete", "error"); } } }}
                     className="text-xs text-red-400/60 hover:text-red-400 font-mono">Delete</button>
                 </div>
               </>

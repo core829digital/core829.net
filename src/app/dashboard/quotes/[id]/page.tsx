@@ -29,7 +29,8 @@ export default function QuoteDetailPage() {
     api.projects.getByUser,
     token && session ? { userId: session.userId, token } : "skip"
   ) ?? [];
-  const project = userProjects[0] ?? null;
+  const project = userProjects.length === 1 ? userProjects[0] : null;
+  const ambiguousProject = userProjects.length > 1;
   const messages = useQuery(
     api.messages.list,
     token && project ? { projectId: project._id, token } : "skip"
@@ -41,6 +42,7 @@ export default function QuoteDetailPage() {
 
   const [msgText, setMsgText] = useState("");
   const [sending, setSending] = useState(false);
+  const [acting, setActing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,6 +95,8 @@ export default function QuoteDetailPage() {
   };
 
   const handleAcceptQuote = async () => {
+    if (acting) return;
+    setActing(true);
     try {
       const token = getSessionToken();
       if (!token) return;
@@ -103,10 +107,14 @@ export default function QuoteDetailPage() {
       });
     } catch {
       toast("Failed to accept quote", "error");
+    } finally {
+      setActing(false);
     }
   };
 
   const handleRejectQuote = async () => {
+    if (acting) return;
+    setActing(true);
     try {
       const token = getSessionToken();
       if (!token) return;
@@ -117,6 +125,8 @@ export default function QuoteDetailPage() {
       });
     } catch {
       toast("Failed to reject quote", "error");
+    } finally {
+      setActing(false);
     }
   };
 

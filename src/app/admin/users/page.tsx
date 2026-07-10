@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
+import { useToast } from "@/components/ui/Toast";
 
 export default function AdminUsers() {
   const token = getSessionToken();
   const users = useQuery(api.auth.list, token ? { token } : "skip");
   const updateRole = useMutation(api.auth.updateRole);
   const removeUser = useMutation(api.auth.remove);
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
 
   const filtered = (users ?? []).filter((u) => {
@@ -49,14 +51,14 @@ export default function AdminUsers() {
               <p className="text-xs text-ink/30 font-mono mt-0.5">ID: {u._id}</p>
             </div>
             <div className="flex gap-2 items-center shrink-0">
-              <select value={u.role} onChange={(e) => updateRole({ email: u.email, role: e.target.value as "admin" | "client" | "lead", token })}
+              <select value={u.role} onChange={async (e) => { try { await updateRole({ email: u.email, role: e.target.value as "admin" | "client" | "lead", token }); } catch { toast("Failed to update role", "error"); } }}
                 className="bg-paper border border-mist rounded-xl px-3 py-1.5 text-xs font-mono text-ink/60 outline-none"
               >
                 <option value="lead">Lead</option>
                 <option value="client">Client</option>
                 <option value="admin">Admin</option>
               </select>
-              <button onClick={() => { if (confirm(`Delete user ${u.name}?`)) removeUser({ userId: u._id, token }); }}
+              <button onClick={async () => { if (confirm(`Delete user ${u.name}?`)) { try { await removeUser({ userId: u._id, token }); } catch { toast("Failed to delete", "error"); } } }}
                 className="text-xs text-red-400/60 hover:text-red-400 font-mono px-2"
               >Delete</button>
             </div>

@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
+import { useToast } from "@/components/ui/Toast";
 
 export default function AdminCases() {
   const token = getSessionToken();
   const caseStudies = useQuery(api.caseStudies.list);
   const update = useMutation(api.caseStudies.update);
   const remove = useMutation(api.caseStudies.remove);
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [newClient, setNewClient] = useState("");
@@ -57,18 +59,22 @@ export default function AdminCases() {
           <div className="flex gap-2">
             <button onClick={async () => {
               if (!newClient || !newSlug || !newSummary || !newMetric || !newMetricLabel) return;
-              await create({
-                client: newClient.trim(),
-                slug: newSlug.trim(),
-                summary: newSummary.trim(),
-                metric: parseFloat(newMetric),
-                metricLabel: newMetricLabel.trim(),
-                serviceTags: newServiceTags.split(",").map((s) => s.trim()).filter(Boolean),
-                content: newContent.trim(),
-                published: false,
-                token,
-              });
-              setNewClient(""); setNewSlug(""); setNewSummary(""); setNewMetric(""); setNewMetricLabel(""); setNewServiceTags(""); setNewContent(""); setShowCreate(false);
+              const metricVal = parseFloat(newMetric);
+              if (isNaN(metricVal)) { toast("Enter a valid metric number", "error"); return; }
+              try {
+                await create({
+                  client: newClient.trim(),
+                  slug: newSlug.trim(),
+                  summary: newSummary.trim(),
+                  metric: metricVal,
+                  metricLabel: newMetricLabel.trim(),
+                  serviceTags: newServiceTags.split(",").map((s) => s.trim()).filter(Boolean),
+                  content: newContent.trim(),
+                  published: false,
+                  token,
+                });
+                setNewClient(""); setNewSlug(""); setNewSummary(""); setNewMetric(""); setNewMetricLabel(""); setNewServiceTags(""); setNewContent(""); setShowCreate(false);
+              } catch { toast("Failed to create case study", "error"); }
             }} className="px-4 py-2 bg-signal text-ink text-xs font-mono uppercase tracking-wider rounded-full hover:bg-signal-dim transition-colors">Create</button>
           </div>
         </div>
@@ -89,12 +95,12 @@ export default function AdminCases() {
               <p className="text-xs text-ink/40 mt-0.5">{c.metric} {c.metricLabel} · {c.serviceTags?.join(", ")}</p>
             </div>
             <div className="flex gap-2 items-center shrink-0">
-              <button onClick={() => update({ id: c._id, token, published: !c.published })}
+              <button onClick={async () => { try { await update({ id: c._id, token, published: !c.published }); } catch { toast("Failed to update", "error"); } }}
                 className={`text-xs font-mono px-2.5 py-0.5 rounded-full ${
                   c.published ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
                 }`}
-              >{c.published ? "Published" : "Draft"}</button>
-              <button onClick={() => { if (confirm("Delete case study?")) remove({ id: c._id, token }); }}
+                >{c.published ? "Published" : "Draft"}</button>
+              <button onClick={async () => { if (confirm("Delete case study?")) { try { await remove({ id: c._id, token }); } catch { toast("Failed to delete", "error"); } } }}
                 className="text-xs text-red-400/60 hover:text-red-400 font-mono">Delete</button>
             </div>
           </div>

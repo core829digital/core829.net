@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
 import type { Doc } from "../../../../convex/_generated/dataModel";
+import { useToast } from "@/components/ui/Toast";
 
 export default function AdminTeam() {
   const token = getSessionToken();
@@ -12,6 +13,7 @@ export default function AdminTeam() {
   const create = useMutation(api.teamMembers.create);
   const update = useMutation(api.teamMembers.update);
   const remove = useMutation(api.teamMembers.remove);
+  const { toast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -50,7 +52,7 @@ export default function AdminTeam() {
             className="bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none" />
           <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Role"
             className="bg-paper border border-mist rounded-xl px-3 py-2 text-sm outline-none" />
-          <button onClick={async () => { if (name && email && role) { await create({ name, email, role, token }); setName(""); setEmail(""); setRole(""); }}}
+          <button onClick={async () => { if (name && email && role) { try { await create({ name, email, role, token }); setName(""); setEmail(""); setRole(""); } catch { toast("Failed to add member", "error"); } }}}
             className="bg-signal text-ink text-xs font-mono rounded-xl hover:bg-signal-dim transition-colors"
           >Add</button>
         </div>
@@ -73,7 +75,7 @@ export default function AdminTeam() {
                   className="bg-paper border border-mist rounded-xl px-3 py-1.5 text-sm outline-none flex-1 min-w-[120px]" />
                 <input value={editRole} onChange={(e) => setEditRole(e.target.value)}
                   className="bg-paper border border-mist rounded-xl px-3 py-1.5 text-sm outline-none w-28" />
-                <button onClick={async () => { await update({ id: m._id, token, name: editName, email: editEmail, role: editRole }); setEditingId(null); }}
+                 <button onClick={async () => { try { await update({ id: m._id, token, name: editName, email: editEmail, role: editRole }); setEditingId(null); } catch { toast("Failed to save", "error"); } }}
                   className="px-3 py-1.5 bg-signal text-ink text-xs font-mono rounded-xl">Save</button>
                 <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-xs font-mono text-ink/40">Cancel</button>
               </div>
@@ -88,7 +90,7 @@ export default function AdminTeam() {
                     {m.active ? "Active" : "Inactive"}
                   </span>
                   <button onClick={() => startEdit(m)} className="text-xs text-ink/40 hover:text-ink font-mono">Edit</button>
-                  <button onClick={() => { if (confirm("Remove team member?")) remove({ id: m._id, token }); }}
+                  <button onClick={async () => { if (confirm("Remove team member?")) { try { await remove({ id: m._id, token }); } catch { toast("Failed to remove", "error"); } } }}
                     className="text-xs text-red-400/60 hover:text-red-400 font-mono">Delete</button>
                 </div>
               </>
