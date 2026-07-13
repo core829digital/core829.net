@@ -1,10 +1,13 @@
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { shouldSimplifyAnimations } from "./deviceCapability";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function initSmoothScroll(): Lenis {
+export function initSmoothScroll(): Lenis | null {
+  if (shouldSimplifyAnimations()) return null;
+
   const lenis = new Lenis({
     duration: 1.1,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -22,7 +25,8 @@ export function initSmoothScroll(): Lenis {
   return lenis;
 }
 
-export function destroySmoothScroll(lenis: Lenis) {
+export function destroySmoothScroll(lenis: Lenis | null) {
+  if (!lenis) return;
   lenis.destroy();
   gsap.ticker.remove((time) => lenis.raf(time * 1000));
 }

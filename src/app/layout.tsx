@@ -45,7 +45,7 @@ export const metadata: Metadata = {
       "Build it. Rent it. Run it. Full-stack digital partner for businesses that need software that actually works.",
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
   manifest: "/manifest",
 };

@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
+import { shouldSimplifyAnimations } from "@/lib/deviceCapability";
 
 interface MagneticButtonProps {
   children: React.ReactNode;
@@ -26,6 +27,7 @@ export function MagneticButton({
   const labelRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    if (shouldSimplifyAnimations()) return;
     const el = ref.current;
     if (!el) return;
 

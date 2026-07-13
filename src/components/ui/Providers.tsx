@@ -26,14 +26,15 @@ function GlobalSystems({ children }: { children: ReactNode }) {
     registerEasing();
     lenisRef.current = initSmoothScroll();
     return () => {
-      if (lenisRef.current) destroySmoothScroll(lenisRef.current);
+      destroySmoothScroll(lenisRef.current);
     };
   }, []);
 
   useEffect(() => {
     ScrollTrigger.refresh(true);
-    if (lenisRef.current) {
-      lenisRef.current.destroy();
+    const lenis = lenisRef.current;
+    if (lenis) {
+      lenis.destroy();
       lenisRef.current = initSmoothScroll();
     }
   }, [pathname]);

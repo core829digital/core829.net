@@ -3,6 +3,7 @@
 import { useRef, useEffect, ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { shouldSimplifyAnimations } from "@/lib/deviceCapability";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,6 +29,7 @@ export function ScrollPinSection({
   const spacerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (shouldSimplifyAnimations()) return;
     const section = sectionRef.current;
     if (!section) return;
 

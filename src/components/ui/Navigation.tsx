@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SERVICES } from "@/lib/brand";
 import { MagneticButton } from "../motion/MagneticButton";
 import { getSessionToken } from "@/lib/cookie";
+import { shouldSimplifyAnimations } from "@/lib/deviceCapability";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,9 +27,8 @@ function useAuth() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const token = getSessionToken();
-    if (token && token.length >= 32) {
-      setAuthed(true);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (token && token.length >= 32) setAuthed(true);
     setLoading(false);
   }, []);
   return { authed, loading };
@@ -42,6 +42,7 @@ export function Navigation() {
   const { authed, loading } = useAuth();
 
   useEffect(() => {
+    if (shouldSimplifyAnimations()) return;
     const nav = navRef.current;
     if (!nav) return;
 
