@@ -3,6 +3,16 @@
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { InteractiveCard } from "@/components/motion/InteractiveCard";
 import { MagneticButton } from "@/components/motion/MagneticButton";
+import { ProcessFlow } from "@/components/motion/ProcessFlow";
+import { InfiniteLoopBackground } from "@/components/motion/InfiniteLoopBackground";
+
+const PRICING_FLOW = [
+  { id: "choose", label: "Choose Model", duration: "Same day", deliverable: "Best-fit recommendation" },
+  { id: "scope", label: "Scope", duration: "1-3 days", deliverable: "Fixed-cost proposal document" },
+  { id: "build", label: "Build / Activate", duration: "Hours to weeks", deliverable: "Working system deployed" },
+  { id: "run", label: "Run", duration: "Ongoing", deliverable: "Hosting, support & iteration" },
+  { id: "scale", label: "Scale", duration: "As needed", deliverable: "Expansion, add-ons & optimization" },
+];
 
 const MODELS = [
   {
@@ -58,6 +68,7 @@ const MODELS = [
 export function PricingContent() {
   return (
     <>
+      <InfiniteLoopBackground variant="dots" />
       <section className="pt-40 section-padding">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-8">
@@ -74,6 +85,13 @@ export function PricingContent() {
           </ScrollReveal>
         </div>
       </section>
+
+      <ProcessFlow
+        stages={PRICING_FLOW}
+        title="From model selection to"
+        subtitle="running at scale."
+        badge="Pricing journey"
+      />
 
       <section className="section-padding pt-0">
         <div className="px-6 max-w-[1440px] mx-auto">

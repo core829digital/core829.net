@@ -2,11 +2,21 @@
 
 import { PROCESS_STEPS } from "@/lib/brand";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
+import { ProcessFlow } from "@/components/motion/ProcessFlow";
+import { InfiniteLoopBackground } from "@/components/motion/InfiniteLoopBackground";
 import { ILLUS_MAP } from "./ProcessIllustrations";
+
+const PROCESS_FLOW = PROCESS_STEPS.map((s) => ({
+  id: s.id,
+  label: s.name,
+  duration: s.duration,
+  deliverable: s.description.split(".")[0] + ".",
+}));
 
 export function ProcessContent() {
   return (
     <>
+      <InfiniteLoopBackground variant="orbits" />
       <section className="pt-40 section-padding">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-8">
@@ -23,6 +33,13 @@ export function ProcessContent() {
           </ScrollReveal>
         </div>
       </section>
+
+      <ProcessFlow
+        stages={PROCESS_FLOW}
+        title="A process, not a"
+        subtitle="black box."
+        badge="The 829 Method"
+      />
 
       <section className="section-padding pt-0">
         {PROCESS_STEPS.map((step, i) => (

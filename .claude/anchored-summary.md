@@ -1,7 +1,21 @@
 # Core829 Renewed — Summary
 
 ## Objective
-Complete a secure client portal with auth, quotes, documents, messaging, and full admin CRUD — accessible from the floating header.
+- Deliver a polished full-stack CRM + marketing site. Now also harden it via a full security audit, bug hunt, and UI/scroll refinement (all deployed to `elated-parakeet-803` and GitHub `main`).
+- Audit deliverables: `SECURITY_AUDIT_REPORT.md`, `BUG_REPORT.md`, `UI_REFINEMENT_LOG.md` (repo root).
+
+## Important Details
+- **Convex internals:** `internalQuery`/`internalMutation` are NOT exposed publicly (only via `ctx.runQuery(internal.*)`). Use for sensitive server-only functions.
+- **Auth guard pattern:** every sensitive mutation/query takes `token` and calls `requireSession`/`requireAdmin` (convex/authHelpers.ts). `getProfile`, `quotes.create`, `quotes.updateStatus`, `messages.send`, `teamMembers.getByEmail` now require token + ownership.
+- **`getUserByEmail` is `internalQuery`** (was public, leaked passwordHash) — call via `internal.auth.getUserByEmail`.
+- **Storage download** (`src/app/api/storage/[id]/route.ts`) verifies ownership via `documents.checkStorageAccess` before proxying.
+- **Route protection** is `src/middleware.ts` (NOT `proxy.ts` — dead code). Next.js only runs `middleware.ts`.
+- **CSRF** tightened in `/api/auth/session` (no `.vercel.app` bypass, reject missing Origin/Referer).
+- **Rate limits:** login (5/30m), signup (3), reset (3/10m), contact (5/10m) via `rateLimits` table.
+- **Dashboard pages are reactive** (`useQuery`) — real-time sync fixed.
+- **Scroll-sync fixed:** FlowMapSection & CaseStudiesGallery `end: "bottom bottom"`; CaseStudiesGallery `min-h-[400vh]`; StackedServices heading "Seven capabilities".
+- **Validation:** Zod schemas in `convex/validation.ts` (phoneSchema, clientType). Contact form has phone+country selector, client type toggle, inline validation.
+- **Build:** 46 routes, clean `tsc`, clean build, `npx convex deploy` OK. Middleware active (`ƒ Proxy (Middleware)` in build output).
 
 ## Stack
 - **Framework:** Next.js 16 (app router, Turbopack)

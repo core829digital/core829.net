@@ -39,6 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/signup",
     "/legal/privacy",
     "/legal/terms",
+    "/legal/cookies",
   ];
 
   return routes.map((route) => ({

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/ui/Navigation";
 import { Footer } from "@/components/ui/Footer";
+import { CookieBanner } from "@/components/ui/CookieBanner";
 import { Providers } from "@/components/ui/Providers";
 import { Atmosphere } from "@/components/ui/Atmosphere";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -29,10 +30,21 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  metadataBase: new URL("https://core829.net"),
   robots: {
     index: true,
     follow: true,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Core829 — Build it. Rent it. Run it.",
+    description:
+      "Build it. Rent it. Run it. Full-stack digital partner for businesses that need software that actually works.",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+  manifest: "/manifest",
 };
 
 export default function RootLayout({
@@ -70,6 +82,7 @@ export default function RootLayout({
             <Atmosphere />
             <Navigation />
             <main id="main-content" className="flex-1">{children}</main>
+            <CookieBanner />
             <Footer />
           </ToastProvider>
         </Providers>
