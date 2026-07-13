@@ -5,6 +5,13 @@
 - Audit deliverables: `SECURITY_AUDIT_REPORT.md`, `BUG_REPORT.md`, `UI_REFINEMENT_LOG.md` (repo root).
 
 ## Important Details
+- **Proxy convention:** `src/proxy.ts` (NOT `middleware.ts` — deprecated in Next.js 16). Code-mod migrated.
+- **Flow maps:** Every public page has a `ProcessFlow` component with configurable stages, infinite-loop SVG particles, hover tooltips.
+- **Infinite animations:** `InfiniteLoopBackground` (5 variants: dots, grid, wave, pulse, orbits) on every page; SVG `<animate>`/`<animateMotion>` with `repeatCount="indefinite"`.
+- **Legal compliance:** Full GDPR privacy policy, ToS (Italy governing law), cookie policy with consent banner. Cookies page explains session-only + optional GA4 analytics.
+- **Industry standards:** `.editorconfig`, `.gitattributes`, `LICENSE` (MIT), `global-error.tsx`, `manifest.ts` (PWA), `opengraph-image.tsx` + `twitter-image.tsx`.
+- **CI/CD:** GitHub Actions (lint+tsc+build on push/PR; convex deploy+build on main). Husky pre-commit (lint-staged eslint), commit-msg (commitlint conventional).
+- **Analytics:** Conditional GA4 via `NEXT_PUBLIC_GA_ID` env var; page view tracking.
 - **Convex internals:** `internalQuery`/`internalMutation` are NOT exposed publicly (only via `ctx.runQuery(internal.*)`). Use for sensitive server-only functions.
 - **Auth guard pattern:** every sensitive mutation/query takes `token` and calls `requireSession`/`requireAdmin` (convex/authHelpers.ts). `getProfile`, `quotes.create`, `quotes.updateStatus`, `messages.send`, `teamMembers.getByEmail` now require token + ownership.
 - **`getUserByEmail` is `internalQuery`** (was public, leaked passwordHash) — call via `internal.auth.getUserByEmail`.
@@ -15,7 +22,7 @@
 - **Dashboard pages are reactive** (`useQuery`) — real-time sync fixed.
 - **Scroll-sync fixed:** FlowMapSection & CaseStudiesGallery `end: "bottom bottom"`; CaseStudiesGallery `min-h-[400vh]`; StackedServices heading "Seven capabilities".
 - **Validation:** Zod schemas in `convex/validation.ts` (phoneSchema, clientType). Contact form has phone+country selector, client type toggle, inline validation.
-- **Build:** 46 routes, clean `tsc`, clean build, `npx convex deploy` OK. Middleware active (`ƒ Proxy (Middleware)` in build output).
+- **Build:** 50 routes (was 46: +legal/cookies, +opengraph-image, +twitter-image, +manifest), clean `tsc`, clean build, `npx convex deploy` OK. Proxy active (`ƒ Proxy (Middleware)` in build output).
 
 ## Stack
 - **Framework:** Next.js 16 (app router, Turbopack)
@@ -23,7 +30,7 @@
 - **Auth:** bcryptjs + session cookies (httpOnly + non-httpOnly for client reads)
 - **Styling:** Tailwind CSS, custom design tokens (ink, paper, graphite, signal, mist)
 - **Language:** TypeScript strict mode
-- **Build:** 46 routes, 0 errors, 0 warnings
+- **Build:** 50 routes, 0 errors, 0 warnings
 
 ## Key Architecture Decisions
 1. **Dual-cookie auth strategy** — httpOnly `session_token` for server-side validation, non-httpOnly `session_token_client` so client JS can read the token to pass to Convex queries. Fixes redirect loop caused by server-only cookie.

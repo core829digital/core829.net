@@ -141,8 +141,16 @@ export default function CookiesPage() {
                 </li>
               </ul>
               <p className="mt-2">
-                We do not use Google Analytics, Facebook Pixel, or any other
-                tracking or analytics service that sets cookies on our site.
+                If you have enabled analytics cookies via our cookie banner, we
+                may use{" "}
+                <strong>Google Analytics 4</strong> to collect anonymized usage
+                data (page views, session duration, referrer). This is optional
+                and only activated with your explicit consent. GA4 uses its own
+                cookies (e.g.,{" "}
+                <span className="font-mono text-xs">_ga</span>,{" "}
+                <span className="font-mono text-xs">_gid</span>) to
+                distinguish users. You can withdraw consent at any time by
+                clearing your browser cookies.
               </p>
             </div>
 

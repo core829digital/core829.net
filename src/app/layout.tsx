@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navigation } from "@/components/ui/Navigation";
 import { Footer } from "@/components/ui/Footer";
 import { CookieBanner } from "@/components/ui/CookieBanner";
+import { Analytics } from "@/components/ui/Analytics";
 import { Providers } from "@/components/ui/Providers";
 import { Atmosphere } from "@/components/ui/Atmosphere";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -80,6 +81,7 @@ export default function RootLayout({
         <Providers>
           <ToastProvider>
             <Atmosphere />
+            <Analytics />
             <Navigation />
             <main id="main-content" className="flex-1">{children}</main>
             <CookieBanner />
