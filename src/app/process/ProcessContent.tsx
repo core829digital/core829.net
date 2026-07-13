@@ -39,6 +39,7 @@ export function ProcessContent() {
         title="A process, not a"
         subtitle="black box."
         badge="The 829 Method"
+        variant="vibrant"
       />
 
       <section data-anim="process-steps" className="section-padding pt-0">

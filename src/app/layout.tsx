@@ -6,6 +6,7 @@ import { Footer } from "@/components/ui/Footer";
 import { CookieBanner } from "@/components/ui/CookieBanner";
 import { Analytics } from "@/components/ui/Analytics";
 import { AnimationEnhancer } from "@/components/motion/AnimationEnhancer";
+import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { Providers } from "@/components/ui/Providers";
 import { Atmosphere } from "@/components/ui/Atmosphere";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -81,6 +82,7 @@ export default function RootLayout({
         </a>
         <Providers>
           <ToastProvider>
+            <ScrollProgressBar />
             <Atmosphere />
             <AnimationEnhancer />
             <Analytics />

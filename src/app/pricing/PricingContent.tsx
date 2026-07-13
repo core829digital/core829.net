@@ -92,6 +92,7 @@ export function PricingContent() {
         title="From model selection to"
         subtitle="running at scale."
         badge="Pricing journey"
+        variant="timeline"
       />
 
       <section data-anim="pricing-cards" className="section-padding pt-0">

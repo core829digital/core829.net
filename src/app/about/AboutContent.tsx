@@ -170,6 +170,7 @@ export function AboutContent() {
         title="From first chat to"
         subtitle="running system."
         badge="The 829 Method"
+        variant="minimal"
       />
 
       <section data-anim="about-footer" className="section-padding border-t border-mist bg-graphite">

@@ -25,7 +25,7 @@ const TEASER_APPS = [
 
 export function RentTeaser() {
   return (
-    <section data-anim="rent-teaser" className="py-24">
+    <section data-anim="rent-teaser" className="py-16 md:py-20">
       <div className="grid-12">
         <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-6">
           <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">

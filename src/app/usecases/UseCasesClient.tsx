@@ -90,6 +90,7 @@ export default function UseCasesClient() {
         title="Every industry gets"
         subtitle="the same rigour."
         badge="Our approach"
+        variant="vibrant"
       />
 
       <section data-anim="usecases-grid" className="section-padding pt-0">

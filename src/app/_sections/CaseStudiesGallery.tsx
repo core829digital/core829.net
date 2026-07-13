@@ -40,7 +40,7 @@ export function CaseStudiesGallery() {
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} data-anim="case-gallery" className="relative min-h-[400vh]">
+    <section ref={sectionRef} data-anim="case-gallery" className="relative min-h-[300vh]">
       <div className="sticky top-0 min-h-dvh overflow-hidden flex flex-col justify-center">
         <div className="absolute top-20 left-0 right-0 z-10">
           <div className="grid-12">

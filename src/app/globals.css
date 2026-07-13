@@ -76,12 +76,12 @@
   }
 
   .section-padding {
-    padding: 100px 0;
+    padding: 64px 0;
   }
 
   @media (max-width: 768px) {
     .section-padding {
-      padding: 72px 0;
+      padding: 48px 0;
     }
   }
 
@@ -213,6 +213,23 @@ html.lenis body {
 .animate-gradient-shift {
   background-size: 200% 200%;
   animation: gradient-shift 6s ease infinite;
+}
+
+.gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.service-card,
+.flow-node,
+[data-anim="case-card"],
+[data-anim="rent-card"] {
+  will-change: transform, opacity;
+}
+
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: 500px;
 }
 
 .animate-stagger-1 {

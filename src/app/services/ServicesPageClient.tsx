@@ -40,6 +40,7 @@ export default function ServicesPageClient() {
         title="Every service follows"
         subtitle="the same rigour."
         badge="Delivery model"
+        variant="minimal"
       />
 
       <section data-anim="services-grid" className="section-padding pt-0">

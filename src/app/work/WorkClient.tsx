@@ -39,6 +39,7 @@ export default function WorkClient() {
         title="Every project follows"
         subtitle="the same path."
         badge="Delivery process"
+        variant="solid"
       />
 
       <section data-anim="work-grid" className="section-padding pt-0">

@@ -63,6 +63,7 @@ export default function WorkWithUsClient() {
         title="Our hiring process:"
         subtitle="transparent, fast, fair."
         badge="Careers"
+        variant="minimal"
       />
 
       <section className="section-padding pt-0">

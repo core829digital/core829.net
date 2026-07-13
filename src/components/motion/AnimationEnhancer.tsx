@@ -22,6 +22,12 @@ export function AnimationEnhancer() {
       const main = mainRef.current;
       if (!main) return;
 
+      // GPU-accelerate all GSAP-animated elements
+      const willChangeEls = main.querySelectorAll("[data-anim]");
+      willChangeEls.forEach((el) => {
+        (el as HTMLElement).style.willChange = "transform, opacity";
+      });
+
       // 1. HERO: 3D depth parallax on mouse — separate layers move at different speeds
       const hero = main.querySelector("[data-anim='hero']");
       if (hero) {

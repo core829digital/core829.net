@@ -15,14 +15,17 @@ export interface FlowStage {
   description?: string;
 }
 
+type FlowVariant = "minimal" | "vibrant" | "solid" | "timeline";
+
 interface ProcessFlowProps {
   stages: FlowStage[];
   title: string;
   subtitle: string;
   badge?: string;
+  variant?: FlowVariant;
 }
 
-export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }: ProcessFlowProps) {
+export function ProcessFlow({ stages, title, subtitle, badge = "How it flows", variant = "minimal" }: ProcessFlowProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const prefersReduced = useReducedMotion();
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -31,17 +34,53 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
   const totalWidth = stages.length * spacing;
   const viewBoxWidth = Math.max(totalWidth + 200, 900);
   const centerY = 200;
+  const nodeY = variant === "timeline" ? centerY : undefined;
   const nodes = stages.map((s, i) => ({
     id: s.id,
     x: 100 + i * spacing + spacing / 2,
-    y: i % 2 === 0 ? centerY - 60 : centerY + 60,
+    y: nodeY !== undefined ? nodeY : (i % 2 === 0 ? centerY - 60 : centerY + 60),
   }));
   const edges = nodes.slice(0, -1).map((n, i) => ({ from: n.id, to: nodes[i + 1].id }));
 
+  const nodeShape = (x: number, y: number, r: number) => {
+    switch (variant) {
+      case "solid": {
+        const s = r * 0.8;
+        const pts = Array.from({ length: 6 }, (_, i) => {
+          const a = (Math.PI / 3) * i - Math.PI / 6;
+          return `${x + s * Math.cos(a)},${y + s * Math.sin(a)}`;
+        }).join(" ");
+        return <polygon points={pts} fill="transparent" stroke="rgba(250,250,250,0.15)" strokeWidth="1" />;
+      }
+      case "vibrant":
+        return <rect x={x - 14} y={y - 14} width="28" height="28" rx="4" fill="transparent" stroke="rgba(225,6,0,0.3)" strokeWidth="1.5" transform={`rotate(45, ${x}, ${y})`} />;
+      case "timeline":
+        return <circle cx={x} cy={y} r="8" fill="var(--color-signal)" opacity="0.8" />;
+      default:
+        return <circle cx={x} cy={y} r="18" fill="transparent" stroke="rgba(250,250,250,0.15)" strokeWidth="1" />;
+    }
+  };
+
+  const edgeStyle = variant === "vibrant"
+    ? { stroke: "rgba(225,6,0,0.12)", strokeWidth: 1.5, strokeDasharray: "2 6" }
+    : variant === "solid"
+    ? { stroke: "rgba(250,250,250,0.06)", strokeWidth: 1, strokeDasharray: "none" }
+    : variant === "timeline"
+    ? { stroke: "var(--color-signal)", strokeWidth: 1, strokeOpacity: 0.15 }
+    : { stroke: "rgba(250,250,250,0.08)", strokeWidth: 1, strokeDasharray: "4 4" };
+
+  const bgClass = variant === "vibrant"
+    ? "bg-gradient-to-b from-graphite via-[#1d0a0a] to-graphite"
+    : variant === "solid"
+    ? "bg-graphite"
+    : variant === "timeline"
+    ? "bg-gradient-to-b from-graphite via-graphite to-paper"
+    : "bg-graphite";
+
   return (
-    <section ref={sectionRef} className="relative min-h-[200vh] overflow-hidden">
+    <section ref={sectionRef} className={`relative min-h-[200vh] overflow-hidden`}>
       <div
-        className="sticky top-0 min-h-dvh bg-graphite text-ink flex items-center justify-center"
+        className={`sticky top-0 min-h-dvh ${bgClass} text-ink flex items-center justify-center`}
         style={{ perspective: prefersReduced ? "none" : "1200px" }}
       >
         <svg
@@ -54,6 +93,13 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
               <stop offset="0%" stopColor="var(--color-signal)" stopOpacity="0.3" />
               <stop offset="100%" stopColor="var(--color-signal)" stopOpacity="0" />
             </radialGradient>
+            {variant === "vibrant" && (
+              <linearGradient id="edge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="var(--color-signal)" stopOpacity="0.05" />
+                <stop offset="50%" stopColor="var(--color-signal)" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="var(--color-signal)" stopOpacity="0.05" />
+              </linearGradient>
+            )}
           </defs>
 
           {edges.map((edge) => {
@@ -65,9 +111,7 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
                 key={`${edge.from}-${edge.to}`}
                 x1={from.x} y1={from.y}
                 x2={to.x} y2={to.y}
-                stroke="rgba(250,250,250,0.08)"
-                strokeWidth="1"
-                strokeDasharray="4 4"
+                {...edgeStyle}
               />
             );
           })}
@@ -76,8 +120,9 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
             const from = nodes.find((n) => n.id === edge.from);
             const to = nodes.find((n) => n.id === edge.to);
             if (!from || !to) return null;
+            const particleColor = variant === "vibrant" ? "var(--color-signal)" : "var(--color-signal)";
             return (
-              <circle key={`orbit-${i}`} r="3" fill="var(--color-signal)" opacity="0.6">
+              <circle key={`orbit-${i}`} r={variant === "timeline" ? "2" : "3"} fill={particleColor} opacity={variant === "timeline" ? "0.4" : "0.6"}>
                 <animateMotion
                   dur={`${3 + i * 0.8}s`}
                   repeatCount="indefinite"
@@ -93,8 +138,8 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
                 <circle key={`pulse-${node.id}`} r="4" fill="var(--color-signal)" opacity="0.4">
                   <animate
                     attributeName="r"
-                    values="4;12;4"
-                    dur="2s"
+                    values={variant === "timeline" ? "2;8;2" : "4;12;4"}
+                    dur={variant === "timeline" ? "1.5s" : "2s"}
                     repeatCount="indefinite"
                     begin={`${nodes.indexOf(node) * 0.3}s`}
                   />
@@ -107,7 +152,7 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
                   />
                 </circle>
               ))}
-              {nodes.map((node) => (
+              {variant !== "timeline" && nodes.map((node) => (
                 <circle key={`glow-${node.id}`} cx={node.x} cy={node.y} r="30" fill="url(#node-glow)">
                   <animate
                     attributeName="r"
@@ -141,17 +186,24 @@ export function ProcessFlow({ stages, title, subtitle, badge = "How it flows" }:
                 tabIndex={0}
                 aria-label={`${node.id.toUpperCase()} ${info?.duration} — ${info?.label}: ${info?.deliverable}`}
               >
-                <circle cx={node.x} cy={node.y} r="18" fill="transparent" stroke="rgba(250,250,250,0.15)" strokeWidth="1" />
-                <text x={node.x} y={node.y + 4} textAnchor="middle" fill="rgba(250,250,250,0.5)" fontSize="9" fontFamily="var(--font-mono)">
-                  {node.id.toUpperCase()}
+                {nodeShape(node.x, node.y, 18)}
+                <text x={node.x} y={node.y + (variant === "timeline" ? -12 : 4)} textAnchor="middle" fill={variant === "timeline" ? "var(--color-signal)" : "rgba(250,250,250,0.5)"} fontSize={variant === "timeline" ? "10" : "9"} fontFamily="var(--font-mono)" fontWeight={variant === "timeline" ? "bold" : "normal"}>
+                  {variant === "timeline" ? (stages.find((s) => s.id === node.id)?.label || node.id) : node.id.toUpperCase()}
                 </text>
-                <text x={node.x} y={node.y + 42} textAnchor="middle" fill="rgba(250,250,250,0.25)" fontSize="8" fontFamily="var(--font-mono)">
-                  {info?.duration}
-                </text>
+                {variant === "timeline" && info && (
+                  <text x={node.x} y={node.y + 20} textAnchor="middle" fill="rgba(250,250,250,0.2)" fontSize="7" fontFamily="var(--font-mono)">
+                    {info.duration}
+                  </text>
+                )}
+                {variant !== "timeline" && (
+                  <text x={node.x} y={node.y + 42} textAnchor="middle" fill="rgba(250,250,250,0.25)" fontSize="8" fontFamily="var(--font-mono)">
+                    {info?.duration}
+                  </text>
+                )}
                 {hoveredNode === node.id && info && (
                   <g>
-                    <rect x={node.x - 70} y={node.y - 55} width="140" height="28" rx="4" fill="rgba(225,6,0,0.9)" />
-                    <text x={node.x} y={node.y - 37} textAnchor="middle" fill="white" fontSize="8" fontFamily="var(--font-body)">
+                    <rect x={node.x - 70} y={variant === "timeline" ? node.y - 42 : node.y - 55} width="140" height={variant === "timeline" ? "20" : "28"} rx="4" fill="rgba(225,6,0,0.9)" />
+                    <text x={node.x} y={variant === "timeline" ? node.y - 30 : node.y - 37} textAnchor="middle" fill="white" fontSize={variant === "timeline" ? "7" : "8"} fontFamily="var(--font-body)">
                       {info.deliverable}
                     </text>
                   </g>
