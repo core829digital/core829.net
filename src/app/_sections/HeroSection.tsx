@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { isLowEndDevice } from "@/lib/deviceCapability";
 
 const Hero3DSceneLease = dynamic(() => import("@/components/three/Hero3DScene").then((m) => ({ default: m.Hero3DScene })), {
   ssr: false,
@@ -14,7 +15,7 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const prefersReduced = useReducedMotion();
-  const [show3D] = useState(true);
+  const [show3D] = useState(() => !isLowEndDevice());
 
   useEffect(() => {
     if (prefersReduced) return;

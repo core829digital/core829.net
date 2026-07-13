@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { isLowEndDevice } from "@/lib/deviceCapability";
 
 interface InfiniteLoopBackgroundProps {
   variant?: "dots" | "grid" | "wave" | "pulse" | "orbits";
@@ -9,10 +11,72 @@ interface InfiniteLoopBackgroundProps {
 
 export function InfiniteLoopBackground({ variant = "dots", density = "medium" }: InfiniteLoopBackgroundProps) {
   const prefersReduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
 
-  if (prefersReduced) return null;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReduced) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        el.style.display = entry.isIntersecting ? "" : "none";
+      },
+      { rootMargin: "1000px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [prefersReduced]);
+
+  if (prefersReduced || isLowEndDevice()) return null;
 
   const count = density === "low" ? 3 : density === "high" ? 8 : 5;
+
+  if (variant === "orbits") {
+    return (
+      <div ref={ref} className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <div className="w-full h-full opacity-[0.03]">
+          {[1, 2, 3].map((ring) => (
+            <div
+              key={ring}
+              className="absolute inset-0"
+              style={{
+                top: "50%", left: "50%",
+                width: `${30 * ring}%`, height: `${20 * ring}%`,
+                margin: `${-10 * ring}% 0 0 ${-15 * ring}%`,
+                border: "0.5px solid var(--color-signal)",
+                borderRadius: "50%",
+                transform: `rotate(${ring * 30}deg)`,
+                animation: `spin ${20 + ring * 10}s linear infinite`,
+              }}
+            />
+          ))}
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (variant === "wave") {
+    return (
+      <div ref={ref} className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <div className="w-full h-full opacity-[0.04]" style={{ background: "repeating-linear-gradient(90deg, transparent, transparent 40px, var(--color-signal) 40px, var(--color-signal) 41px)", backgroundSize: "80px 100%", animation: "wave-slide 6s linear infinite" }} />
+        <style>{`@keyframes wave-slide { to { background-position: -80px 0; } }`}</style>
+      </div>
+    );
+  }
+
+  if (variant === "pulse") {
+    return (
+      <div ref={ref} className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        <div className="w-full h-full opacity-[0.03]">
+          <div className="absolute rounded-full border border-signal" style={{ top: "30%", left: "20%", animation: "pulse-ring 5s ease-out infinite" }} />
+          <div className="absolute rounded-full border border-signal" style={{ top: "70%", left: "80%", animation: "pulse-ring 4s ease-out infinite 1s" }} />
+          <div className="absolute rounded-full border border-signal" style={{ top: "50%", left: "50%", animation: "pulse-ring 7s ease-out infinite 2s" }} />
+        </div>
+        <style>{`@keyframes pulse-ring { 0% { width:0;height:0;opacity:0.5; } 100% { width:400px;height:400px;margin:-200px 0 0 -200px;opacity:0; } }`}</style>
+      </div>
+    );
+  }
+
   const particles = Array.from({ length: count }, (_, i) => ({
     id: i,
     cx: 10 + (i * 140) % 90,
@@ -22,121 +86,36 @@ export function InfiniteLoopBackground({ variant = "dots", density = "medium" }:
     dur: 3 + (i % 3) * 2,
   }));
 
-  if (variant === "orbits") {
-    return (
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-        <svg className="w-full h-full opacity-[0.03]">
-          {[1, 2, 3].map((ring) => (
-            <g key={ring}>
-              <ellipse
-                cx="50%" cy="50%"
-                rx={`${15 * ring}%`} ry={`${10 * ring}%`}
-                fill="none" stroke="var(--color-signal)"
-                strokeWidth="0.5"
-                transform={`rotate(${ring * 30} 50% 50%)`}
-              >
-                <animateTransform
-                  attributeName="transform"
-                  type="rotate"
-                  from={`${ring * 30} 50% 50%`}
-                  to={`${ring * 30 + 360} 50% 50%`}
-                  dur={`${20 + ring * 10}s`}
-                  repeatCount="indefinite"
-                />
-              </ellipse>
-              <circle r="2" fill="var(--color-signal)">
-                <animateMotion
-                  dur={`${20 + ring * 10}s`}
-                  repeatCount="indefinite"
-                  path={`M${50 + 15 * ring * Math.cos(ring * 0.5)},${50 + 10 * ring * Math.sin(ring * 0.5)} A${15 * ring} ${10 * ring} 0 1 1 ${50 + 15 * ring * Math.cos(ring * 0.5 + 0.01)},${50 + 10 * ring * Math.sin(ring * 0.5 + 0.01)}`}
-                />
-              </circle>
-            </g>
-          ))}
-        </svg>
-      </div>
-    );
-  }
-
-  if (variant === "wave") {
-    return (
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-        <svg className="w-full h-full opacity-[0.04]" preserveAspectRatio="none">
-          <path d="M0,50 Q25,30 50,50 T100,50 T150,50 T200,50" fill="none" stroke="var(--color-signal)" strokeWidth="1">
-            <animate
-              attributeName="d"
-              values="M0,50 Q25,30 50,50 T100,50 T150,50 T200,50;M0,50 Q25,70 50,50 T100,50 T150,50 T200,50;M0,50 Q25,30 50,50 T100,50 T150,50 T200,50"
-              dur="6s"
-              repeatCount="indefinite"
-            />
-          </path>
-          <path d="M0,60 Q25,40 50,60 T100,60 T150,60 T200,60" fill="none" stroke="var(--color-signal)" strokeWidth="0.5" opacity="0.5">
-            <animate
-              attributeName="d"
-              values="M0,60 Q25,40 50,60 T100,60 T150,60 T200,60;M0,60 Q25,80 50,60 T100,60 T150,60 T200,60;M0,60 Q25,40 50,60 T100,60 T150,60 T200,60"
-              dur="8s"
-              repeatCount="indefinite"
-            />
-          </path>
-        </svg>
-      </div>
-    );
-  }
-
-  if (variant === "pulse") {
-    return (
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-        <svg className="w-full h-full opacity-[0.03]">
-          <circle cx="20%" cy="30%" r="0" fill="none" stroke="var(--color-signal)" strokeWidth="1">
-            <animate attributeName="r" values="0;200" dur="5s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.5;0" dur="5s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="80%" cy="70%" r="0" fill="none" stroke="var(--color-signal)" strokeWidth="1">
-            <animate attributeName="r" values="0;150" dur="4s" repeatCount="indefinite" begin="1s" />
-            <animate attributeName="opacity" values="0.5;0" dur="4s" repeatCount="indefinite" begin="1s" />
-          </circle>
-          <circle cx="50%" cy="50%" r="0" fill="none" stroke="var(--color-signal)" strokeWidth="0.5">
-            <animate attributeName="r" values="0;300" dur="7s" repeatCount="indefinite" begin="2s" />
-            <animate attributeName="opacity" values="0.3;0" dur="7s" repeatCount="indefinite" begin="2s" />
-          </circle>
-        </svg>
-      </div>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-      <svg className="w-full h-full opacity-[0.03]">
+    <div ref={ref} className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+      <div className="w-full h-full opacity-[0.03]">
         {particles.map((p) => (
-          <g key={p.id}>
-            <circle cx={`${p.cx}%`} cy={`${p.cy}%`} r={p.r} fill="var(--color-signal)">
-              <animate
-                attributeName="opacity"
-                values="0;0.8;0"
-                dur={`${p.dur}s`}
-                repeatCount="indefinite"
-                begin={`${p.delay}s`}
-              />
-            </circle>
-          </g>
+          <div
+            key={p.id}
+            className="absolute rounded-full bg-signal"
+            style={{
+              left: `${p.cx}%`, top: `${p.cy}%`,
+              width: `${p.r * 2}px`, height: `${p.r * 2}px`,
+              animation: `dot-pulse ${p.dur}s ease-in-out infinite`,
+              animationDelay: `${p.delay}s`,
+            }}
+          />
         ))}
         {Array.from({ length: 2 }, (_, i) => (
-          <g key={`orbit-${i}`}>
-            <circle
-              cx={`${30 + i * 40}%`}
-              cy="50%"
-              r="2"
-              fill="var(--color-signal)"
-            >
-              <animateMotion
-                dur={`${8 + i * 3}s`}
-                repeatCount="indefinite"
-                path={`M${30 + i * 40},50 C${40 + i * 30},30 ${60 + i * 20},30 ${70 + i * 10},50 C${60 + i * 20},70 ${40 + i * 30},70 ${30 + i * 40},50`}
-              />
-            </circle>
-          </g>
+          <div
+            key={`orbit-${i}`}
+            className="absolute w-1 h-1 rounded-full bg-signal"
+            style={{
+              animation: `orbit-${i} ${8 + i * 3}s linear infinite`,
+            }}
+          />
         ))}
-      </svg>
+        <style>{`
+          @keyframes dot-pulse { 0%,100% { opacity:0; } 50% { opacity:0.8; } }
+          @keyframes orbit-0 { 0% { transform:translate(30vw,50vh); } 25% { transform:translate(60vw,30vh); } 50% { transform:translate(70vw,50vh); } 75% { transform:translate(50vw,70vh); } 100% { transform:translate(30vw,50vh); } }
+          @keyframes orbit-1 { 0% { transform:translate(70vw,50vh); } 25% { transform:translate(80vw,40vh); } 50% { transform:translate(90vw,50vh); } 75% { transform:translate(80vw,60vh); } 100% { transform:translate(70vw,50vh); } }
+        `}</style>
+      </div>
     </div>
   );
 }
