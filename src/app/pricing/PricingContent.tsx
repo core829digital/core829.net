@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { InteractiveCard } from "@/components/motion/InteractiveCard";
 import { MagneticButton } from "@/components/motion/MagneticButton";
@@ -69,7 +70,7 @@ export function PricingContent() {
   return (
     <>
       <InfiniteLoopBackground variant="dots" />
-      <section className="pt-40 section-padding">
+      <section data-anim="pricing-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -93,7 +94,7 @@ export function PricingContent() {
         badge="Pricing journey"
       />
 
-      <section className="section-padding pt-0">
+      <section data-anim="pricing-cards" className="section-padding pt-0">
         <div className="px-6 max-w-[1440px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {MODELS.map((model, i) => (
@@ -134,7 +135,7 @@ export function PricingContent() {
         </div>
       </section>
 
-      <section className="section-padding border-t border-mist">
+      <section data-anim="pricing-cta" className="section-padding border-t border-mist">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-6">
             <h2 className="text-display text-3xl md:text-4xl tracking-tight">
@@ -157,19 +158,19 @@ export function PricingContent() {
               </p>
               <ul className="mt-4 space-y-3">
                 <li>
-                  <a href="/services" className="text-sm text-ink/60 hover:text-signal transition-colors">
+                  <Link href="/services" className="text-sm text-ink/60 hover:text-signal transition-colors">
                     View all services
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/process" className="text-sm text-ink/60 hover:text-signal transition-colors">
+                  <Link href="/process" className="text-sm text-ink/60 hover:text-signal transition-colors">
                     How we work
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/services/rent-webapps" className="text-sm text-ink/60 hover:text-signal transition-colors">
+                  <Link href="/services/rent-webapps" className="text-sm text-ink/60 hover:text-signal transition-colors">
                     Browse rentable apps
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

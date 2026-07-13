@@ -70,7 +70,7 @@ export default function UseCasesClient() {
   return (
     <>
       <InfiniteLoopBackground variant="grid" />
-      <section className="pt-40 section-padding">
+      <section data-anim="usecases-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <div className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">Applications</span>
@@ -92,7 +92,7 @@ export default function UseCasesClient() {
         badge="Our approach"
       />
 
-      <section className="section-padding pt-0">
+      <section data-anim="usecases-grid" className="section-padding pt-0">
         <div className="max-w-[1440px] mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {USE_CASES.map((uc) => (
@@ -116,7 +116,7 @@ export default function UseCasesClient() {
         </div>
       </section>
 
-      <section className="section-padding pt-0">
+      <section data-anim="usecases-cta" className="section-padding pt-0">
         <div className="grid-12">
           <div className="col-span-12 md:col-span-8 md:col-start-3 text-center">
             <h2 className="text-display text-3xl md:text-5xl tracking-tight">

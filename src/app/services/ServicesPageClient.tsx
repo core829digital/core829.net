@@ -16,7 +16,7 @@ export default function ServicesPageClient() {
   return (
     <>
       <InfiniteLoopBackground variant="wave" />
-      <section className="pt-40 section-padding">
+      <section data-anim="services-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <div className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -42,7 +42,7 @@ export default function ServicesPageClient() {
         badge="Delivery model"
       />
 
-      <section className="section-padding pt-0">
+      <section data-anim="services-grid" className="section-padding pt-0">
         <ServicesGrid />
       </section>
     </>

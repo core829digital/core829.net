@@ -66,7 +66,7 @@ export function AboutContent() {
   return (
     <>
       <InfiniteLoopBackground variant="pulse" />
-      <section className="pt-40 section-padding">
+      <section data-anim="about-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-7">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -93,7 +93,7 @@ export function AboutContent() {
         </div>
       </section>
 
-      <section className="section-padding border-t border-mist">
+      <section data-anim="about-stats" className="section-padding border-t border-mist">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
@@ -108,7 +108,7 @@ export function AboutContent() {
         </div>
       </section>
 
-      <section className="section-padding border-t border-mist">
+      <section data-anim="about-pillars" className="section-padding border-t border-mist">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-4">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -133,7 +133,7 @@ export function AboutContent() {
         </div>
       </section>
 
-      <section className="section-padding border-t border-mist">
+      <section data-anim="about-method" className="section-padding border-t border-mist">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-5">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -172,7 +172,7 @@ export function AboutContent() {
         badge="The 829 Method"
       />
 
-      <section className="section-padding border-t border-mist bg-graphite">
+      <section data-anim="about-footer" className="section-padding border-t border-mist bg-graphite">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-6">
             <h2 className="text-display text-3xl md:text-5xl tracking-tight">
@@ -181,16 +181,16 @@ export function AboutContent() {
               <span className="text-signal">Building anywhere.</span>
             </h2>
             <p className="mt-6 text-ink/50 leading-relaxed max-w-lg">
-              Core829 was founded on the belief that businesses shouldn't have to choose between
+              Core829 was founded on the belief that businesses shouldn&apos;t have to choose between
               agency overhead and DIY chaos. You get the capability of a full software house with
               the accountability of a single senior operator.
             </p>
           </ScrollReveal>
           <ScrollReveal variant="fade-up" delay={0.1} className="col-span-12 md:col-span-4 md:col-start-9 mt-8 md:mt-0">
             <p className="text-ink/40 text-sm leading-relaxed">
-              &ldquo;We don't scale by adding layers. We scale by staying lean and bringing in the
-              right people per project. That's how you get agency-quality output without agency-
-              sized overhead.&rdquo;
+               &ldquo;We don&apos;t scale by adding layers. We scale by staying lean and bringing in the
+               right people per project. That&apos;s how you get agency-quality output without agency-
+               sized overhead.&rdquo;
             </p>
             <div className="mt-6">
               <MagneticButton href="/contact" variant="primary">

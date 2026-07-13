@@ -1,7 +1,7 @@
 import { HeroSection } from "./_sections/HeroSection";
 import { CapabilityStrip } from "./_sections/CapabilityStrip";
 import { StackedServices } from "./_sections/StackedServices";
-import { FlowMapSection } from "./_sections/FlowMapSection";
+import { SiteWideFlowMap } from "@/components/motion/SiteWideFlowMap";
 import { CaseStudiesGallery } from "./_sections/CaseStudiesGallery";
 import { ProcessTeaser } from "./_sections/ProcessTeaser";
 import { RentTeaser } from "./_sections/RentTeaser";
@@ -13,7 +13,7 @@ export default function Home() {
       <HeroSection />
       <CapabilityStrip />
       <StackedServices />
-      <FlowMapSection />
+      <SiteWideFlowMap />
       <CaseStudiesGallery />
       <ProcessTeaser />
       <RentTeaser />

@@ -17,7 +17,7 @@ export default function WorkClient() {
   return (
     <>
       <InfiniteLoopBackground variant="pulse" />
-      <section className="pt-40 section-padding">
+      <section data-anim="work-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <div className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -41,7 +41,7 @@ export default function WorkClient() {
         badge="Delivery process"
       />
 
-      <section className="section-padding pt-0">
+      <section data-anim="work-grid" className="section-padding pt-0">
         <div className="max-w-[1440px] mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {CASE_STUDIES.map((cs) => (

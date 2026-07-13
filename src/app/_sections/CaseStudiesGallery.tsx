@@ -40,7 +40,7 @@ export function CaseStudiesGallery() {
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[400vh]">
+    <section ref={sectionRef} data-anim="case-gallery" className="relative min-h-[400vh]">
       <div className="sticky top-0 min-h-dvh overflow-hidden flex flex-col justify-center">
         <div className="absolute top-20 left-0 right-0 z-10">
           <div className="grid-12">
@@ -52,7 +52,7 @@ export function CaseStudiesGallery() {
         </div>
         <div ref={trackRef} className="flex gap-12 items-center" style={{ paddingLeft: "50vw", willChange: "transform" }}>
           {CASE_STUDIES.filter((cs) => cs.slug !== "core829-crm").map((cs) => (
-            <Link key={cs.slug} href={`/work/${cs.slug}`} className="group flex-shrink-0 w-[70vw] md:w-[40vw] h-[60vh] bg-graphite rounded-2xl p-12 flex flex-col justify-end relative overflow-hidden border border-mist"
+            <Link key={cs.slug} href={`/work/${cs.slug}`} data-anim="case-card" className="group flex-shrink-0 w-[70vw] md:w-[40vw] h-[60vh] bg-graphite rounded-2xl p-12 flex flex-col justify-end relative overflow-hidden border border-mist"
               onMouseEnter={() => { setCursor("link", "View"); }}
               onMouseLeave={() => { setCursor("default"); }}>
               <div className="relative z-10">

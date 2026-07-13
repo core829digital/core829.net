@@ -87,16 +87,16 @@ export function StackedServices() {
         </div>
       </div>
       {SERVICES.map((service) => (
-        <Link key={service.id} href={`/services/${service.slug}`} className="block service-card min-h-[70dvh] border-b border-mist">
+        <Link key={service.id} href={`/services/${service.slug}`} data-anim="service-card" data-card-border className="block service-card min-h-[70dvh] border-b border-mist">
           <InteractiveCard className="h-full flex items-center" tiltAmount={3} glare={false}>
             <div className="grid-12 items-center py-16">
               <div className="col-span-12 md:col-span-1">
-                <span className="service-numeral font-mono text-7xl md:text-9xl font-bold leading-none"
+                <span data-numeral className="service-numeral font-mono text-7xl md:text-9xl font-bold leading-none"
                   style={{ color: "currentColor", WebkitTextStroke: "1px currentColor", WebkitTextFillColor: "transparent" }}>
                   {service.numeral}
                 </span>
               </div>
-              <div className="col-span-12 md:col-span-5 mt-4 md:mt-0">
+              <div data-card-content className="col-span-12 md:col-span-5 mt-4 md:mt-0">
                 <h3 className="text-display text-3xl md:text-5xl tracking-tight">{service.name}</h3>
                 <p className="mt-6 text-ink/60 leading-relaxed max-w-lg">{service.description}</p>
               </div>

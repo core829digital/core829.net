@@ -26,7 +26,7 @@ export function ServiceDetailClient({
   return (
     <>
       {}
-      <section className="pt-40 min-h-dvh flex items-center relative overflow-hidden">
+      <section data-anim="service-hero" className="pt-40 min-h-dvh flex items-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
           <div className="w-full h-full bg-[radial-gradient(ellipse_at_top_right,var(--color-signal),transparent_70%)]" />
         </div>
@@ -50,7 +50,7 @@ export function ServiceDetailClient({
       </section>
 
       {}
-      <section className="section-padding border-t border-mist relative">
+      <section data-anim="service-problem" className="section-padding border-t border-mist relative">
         <div className="grid-12">
           <div className="col-span-12 md:col-span-5">
             <ScrollReveal variant="fade-left">
@@ -77,7 +77,7 @@ export function ServiceDetailClient({
       </section>
 
       {}
-      <section className="section-padding bg-graphite border-t border-mist">
+      <section data-anim="service-approach" className="section-padding bg-graphite border-t border-mist">
         <div className="grid-12">
           <div className="col-span-12 md:col-span-5">
             <ScrollReveal variant="fade-up">
@@ -102,7 +102,7 @@ export function ServiceDetailClient({
       </section>
 
       {}
-      <section className="section-padding border-t border-mist">
+      <section data-anim="service-features" className="section-padding border-t border-mist">
         <ScrollReveal variant="fade-up">
           <div className="grid-12">
             <div className="col-span-12 md:col-span-8">
@@ -126,7 +126,7 @@ export function ServiceDetailClient({
 
       {}
       {service.faq.length > 0 && (
-        <section className="section-padding border-t border-mist bg-graphite/30">
+        <section data-anim="service-faq" className="section-padding border-t border-mist bg-graphite/30">
           <ScrollReveal variant="fade-up">
             <div className="grid-12">
               <div className="col-span-12 md:col-span-8">
@@ -161,7 +161,7 @@ export function ServiceDetailClient({
       )}
 
       {}
-      <section className="section-padding bg-signal/5 border-t border-mist">
+      <section data-anim="service-cta" className="section-padding bg-signal/5 border-t border-mist">
         <ScrollReveal variant="scale-in" className="text-center">
           <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">Ready to start?</span>
           <h2 className="text-display text-3xl md:text-6xl tracking-tight mt-4">
@@ -179,7 +179,7 @@ export function ServiceDetailClient({
       </section>
 
       {}
-      <section className="section-padding border-t border-mist">
+      <section data-anim="service-other" className="section-padding border-t border-mist">
         <ScrollReveal variant="fade-up">
           <div className="grid-12">
             <div className="col-span-12">

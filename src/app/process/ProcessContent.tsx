@@ -17,7 +17,7 @@ export function ProcessContent() {
   return (
     <>
       <InfiniteLoopBackground variant="orbits" />
-      <section className="pt-40 section-padding">
+      <section data-anim="process-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -41,7 +41,7 @@ export function ProcessContent() {
         badge="The 829 Method"
       />
 
-      <section className="section-padding pt-0">
+      <section data-anim="process-steps" className="section-padding pt-0">
         {PROCESS_STEPS.map((step, i) => (
           <ScrollReveal key={step.id} variant="fade-up" delay={i * 0.06}>
             <div className="grid-12 py-20 border-t border-mist items-center">
@@ -70,7 +70,7 @@ export function ProcessContent() {
         ))}
       </section>
 
-      <section className="section-padding bg-graphite">
+      <section data-anim="process-footer" className="section-padding bg-graphite">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-8">
             <h2 className="text-display text-3xl md:text-5xl tracking-tight">

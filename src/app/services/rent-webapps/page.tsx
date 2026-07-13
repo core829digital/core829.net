@@ -132,7 +132,7 @@ export default function RentWebAppsPage() {
 
   return (
     <>
-      <section className="pt-40 section-padding">
+      <section data-anim="rent-hero" className="pt-40 section-padding">
         <div className="grid-12">
           <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-8">
             <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -151,7 +151,7 @@ export default function RentWebAppsPage() {
         </div>
       </section>
 
-      <section className="pb-20">
+      <section data-anim="rent-apps" className="pb-20">
         <div className="px-6 max-w-[1440px] mx-auto">
           {}
           <div className="flex gap-3 mb-12 overflow-x-auto pb-2">

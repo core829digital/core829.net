@@ -51,9 +51,12 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
+      data-anim="hero"
       className="relative h-dvh bg-paper overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-graphite via-graphite to-transparent z-10 pointer-events-none" />
+      <div data-depth="3" className="absolute inset-0 bg-gradient-to-r from-graphite via-graphite to-transparent z-10 pointer-events-none" />
+      <div data-depth="1" className="absolute top-20 right-[10%] w-32 h-32 rounded-full bg-signal/5 blur-3xl pointer-events-none" />
+      <div data-depth="2" className="absolute bottom-40 left-[5%] w-24 h-24 rounded-full bg-signal/5 blur-2xl pointer-events-none" />
 
       <div className="absolute inset-0 right-0 w-full md:w-[60%] ml-auto">
         {show3D && <Hero3DSceneLease />}
@@ -61,7 +64,7 @@ export function HeroSection() {
 
       <div className="relative z-20 h-full flex items-center">
         <div className="w-full max-w-6xl mx-auto px-6">
-          <div className="max-w-3xl">
+          <div data-hero-content className="max-w-3xl">
             <span className="hero-fade font-mono text-signal text-xs tracking-[0.2em] uppercase block mb-6 opacity-0">
               Software House
             </span>

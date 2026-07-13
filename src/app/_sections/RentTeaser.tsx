@@ -25,7 +25,7 @@ const TEASER_APPS = [
 
 export function RentTeaser() {
   return (
-    <section className="py-24">
+    <section data-anim="rent-teaser" className="py-24">
       <div className="grid-12">
         <ScrollReveal variant="fade-up" className="col-span-12 md:col-span-6">
           <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">
@@ -51,7 +51,7 @@ export function RentTeaser() {
           {TEASER_APPS.map((app, i) => (
             <ScrollReveal key={app.name} variant="fade-right" delay={i * 0.1}>
               <Link href="/services/rent-webapps" className="block">
-                <InteractiveCard className="p-6 border border-mist hover:border-signal/20 hover:bg-ghost transition-colors" tiltAmount={5}>
+                <InteractiveCard data-anim="rent-card" className="p-6 border border-mist hover:border-signal/20 hover:bg-ghost transition-colors" tiltAmount={5}>
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="text-display text-lg group-hover:text-signal transition-colors">

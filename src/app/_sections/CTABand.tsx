@@ -41,7 +41,7 @@ export function CTABand() {
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} className="relative pt-28 pb-0 bg-graphite text-ink overflow-hidden">
+    <section ref={sectionRef} data-anim="cta" className="relative pt-28 pb-0 bg-graphite text-ink overflow-hidden">
       {}
       <div className="absolute inset-0 opacity-[0.03]">
         <svg className="w-full h-full" viewBox="0 0 1440 600">

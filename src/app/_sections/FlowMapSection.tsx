@@ -50,7 +50,7 @@ export function FlowMapSection() {
       const totalLength = EDGES.length;
       const progress = { value: 0 };
 
-      const tl = gsap.to(progress, {
+      gsap.to(progress, {
         value: 1,
         ease: "none",
         scrollTrigger: {
@@ -89,7 +89,7 @@ export function FlowMapSection() {
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[300vh]">
+    <section ref={sectionRef} data-anim="flowmap" className="relative min-h-[300vh]">
       <div className="sticky top-0 min-h-dvh bg-graphite text-ink overflow-hidden flex items-center justify-center">
         <svg viewBox="0 0 1300 400" className="w-full h-full max-w-[90vw]" style={{ filter: prefersReduced ? "none" : undefined }}>
           {EDGES.map((edge) => {

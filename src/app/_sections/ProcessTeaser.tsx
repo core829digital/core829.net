@@ -40,7 +40,7 @@ export function ProcessTeaser() {
   const steps = PROCESS_STEPS.slice(0, 4);
 
   return (
-    <section ref={sectionRef} className="py-24">
+    <section ref={sectionRef} data-anim="process" className="py-24">
       <div className="grid-12">
         <div className="col-span-12 md:col-span-8">
           <span className="font-mono text-signal text-xs tracking-[0.2em] uppercase">

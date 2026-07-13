@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export function CapabilityStrip() {
   return (
-    <section className="py-12 border-b border-mist">
+    <section data-anim="strip" className="relative py-12 border-b border-mist">
       <div className="mb-6 px-6">
         <span className="font-mono text-[10px] text-ink/60 tracking-[0.2em] uppercase">
           Everything you need
