@@ -5,7 +5,7 @@ import { requireAdmin } from "./authHelpers";
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("caseStudies").collect();
+    return await ctx.db.query("caseStudies").take(50);
   },
 });
 
@@ -35,7 +35,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.token);
-    const { token: _, ...fields } = args;
+    const { token: _t, ...fields } = args;
     return await ctx.db.insert("caseStudies", {
       ...fields,
       gallery: fields.gallery || [],
@@ -61,7 +61,7 @@ export const update = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.token);
-    const { id, token: _, ...fields } = args;
+    const { id, token: _t, ...fields } = args;
     await ctx.db.patch(id, fields);
   },
 });

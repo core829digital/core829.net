@@ -1,39 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useConvex } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import type { Doc } from "../../../../convex/_generated/dataModel";
 import { getSessionToken } from "@/lib/cookie";
-import { useToast } from "@/components/ui/Toast";
 
 export default function ClientProjects() {
-  const convex = useConvex();
-  const router = useRouter();
-  const { toast } = useToast();
-  const [projects, setProjects] = useState<Doc<"projects">[]>([]);
-  const [loading, setLoading] = useState(true);
+  const token = getSessionToken();
+  const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
+  const projects = useQuery(
+    api.projects.getByUser,
+    token && session ? { userId: session.userId, token } : "skip"
+  ) ?? [];
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const token = getSessionToken();
-        if (!token) { router.push("/login?redirect=/dashboard/projects"); return; }
-
-        const session = await convex.query(api.auth.validateSession, { token });
-        if (!session) { router.push("/login?redirect=/dashboard/projects"); return; }
-
-        const userProjects = await convex.query(api.projects.getByUser, { userId: session.userId as any, token });
-        setProjects(userProjects);
-      } catch { toast("Failed to load projects", "error"); }
-      setLoading(false);
-    };
-    init();
-  }, [convex, router, toast]);
-
-  if (loading) {
+  if (session === undefined) {
     return <div className="flex items-center justify-center min-h-[60vh]"><p className="text-ink/60 font-mono text-sm">Loading...</p></div>;
   }
 

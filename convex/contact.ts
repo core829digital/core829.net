@@ -30,18 +30,15 @@ export const submit = action({
     const rateKey = `contact:${data.email.toLowerCase()}`;
     const limits = await ctx.runQuery(api.auth.getRateLimits, { key: rateKey });
     if (limits.length > 0) {
-      const e = limits[0];
-      const RATE_LIMIT_BLOCK_MS = 10 * 60 * 1000;
-      if (e.blockedUntil && e.blockedUntil > Date.now()) {
+      const entry = limits[0];
+      if (entry.blockedUntil && entry.blockedUntil > Date.now()) {
         throw new Error("Too many messages. Please try again later.");
       }
-      if (e.attempts >= 5) {
-        await ctx.runMutation(api.auth.recordFailedAttempt, { key: rateKey });
+      if (entry.attempts >= 5) {
         throw new Error("Too many messages. Please try again later.");
       }
     }
     await ctx.runMutation(api.auth.recordFailedAttempt, { key: rateKey });
-    const description = data.message || data.projectType || "No details provided";
 
     await ctx.runMutation(api.leads.create, {
       name: data.name,
@@ -65,9 +62,10 @@ export const submit = action({
       serviceInterest: data.serviceInterest,
       budget: data.budget,
       timeline: data.timeline,
-      description,
+      description: data.message || data.projectType || "No details provided",
     });
 
+    const notifyEmail = process.env.NOTIFICATION_EMAIL || "contact.core829@gmail.com";
     if (process.env.RESEND_API_KEY?.startsWith("re_")) {
       try {
         const { Resend } = await import("resend");
@@ -75,7 +73,7 @@ export const submit = action({
 
         await new Resend(process.env.RESEND_API_KEY).emails.send({
           from: "Core829 <noreply@core829.net>",
-          to: ["contact.core829@gmail.com"],
+          to: [notifyEmail],
           subject: `New project request: ${serviceName}`,
           html: `
             <h2>New project request received</h2>

@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query, internalQuery } from "./_generated/server";
+import { mutation, query, internalQuery, internalMutation } from "./_generated/server";
 import { requireAdmin } from "./authHelpers";
 
 export const getUserByEmail = internalQuery({
@@ -80,10 +80,11 @@ export const validateSession = query({
 export const getRateLimits = query({
   args: { key: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const result = await ctx.db
       .query("rateLimits")
       .withIndex("by_key", (q) => q.eq("key", args.key))
-      .collect();
+      .first();
+    return result ? [result] : [];
   },
 });
 
@@ -132,10 +133,10 @@ export const clearRateLimit = mutation({
   },
 });
 
-export const cleanExpiredSessions = mutation({
+export const cleanExpiredSessions = internalMutation({
   args: {},
   handler: async (ctx) => {
-    const sessions = await ctx.db.query("sessions").collect();
+    const sessions = await ctx.db.query("sessions").take(500);
     const now = Date.now();
     for (const session of sessions) {
       if (session.expiresAt < now) {
@@ -201,11 +202,8 @@ export const list = query({
   args: { token: v.string() },
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.token);
-    const users = await ctx.db.query("users").collect();
-    return users.map((u) => {
-      const { passwordHash, ...rest } = u;
-      return rest;
-    });
+    const users = await ctx.db.query("users").take(200);
+    return users.map(({ passwordHash: _hash, ...rest }) => rest);
   },
 });
 

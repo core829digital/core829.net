@@ -47,7 +47,7 @@ export default defineSchema({
     activeServices: v.array(v.string()),
     contractStart: v.number(),
     monthlyRetainer: v.optional(v.number()),
-  }),
+  }).index("by_userId", ["userId"]),
 
   teamMembers: defineTable({
     name: v.string(),
@@ -142,7 +142,9 @@ export default defineSchema({
         paid: v.boolean(),
       })
     ),
-  }).index("by_clientUserId", ["clientUserId"]),
+  })
+    .index("by_clientUserId", ["clientUserId"])
+    .index("by_clientId", ["clientId"]),
 
   quotes: defineTable({
     userId: v.id("users"),
@@ -160,7 +162,9 @@ export default defineSchema({
     pdfStorageId: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"])
+    .index("by_pdfStorageId", ["pdfStorageId"]),
 
   projectMessages: defineTable({
     projectId: v.id("projects"),
@@ -177,7 +181,9 @@ export default defineSchema({
     storageId: v.string(),
     uploadedBy: v.id("users"),
     createdAt: v.number(),
-  }).index("by_project", ["projectId"]),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_storageId", ["storageId"]),
 
   passwordResetTokens: defineTable({
     email: v.string(),

@@ -7,7 +7,7 @@ export const list = query({
   handler: async (ctx, args) => {
     if (!args.token) return [];
     await requireSession(ctx, args.token);
-    return await ctx.db.query("teamMembers").collect();
+    return await ctx.db.query("teamMembers").take(50);
   },
 });
 
@@ -31,7 +31,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.token);
-    const { token: _, ...fields } = args;
+    const { token: _t, ...fields } = args;
     return await ctx.db.insert("teamMembers", {
       ...fields,
       active: true,
@@ -51,7 +51,7 @@ export const update = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.token);
-    const { id, token: _, ...fields } = args;
+    const { id, token: _t, ...fields } = args;
     await ctx.db.patch(id, fields);
   },
 });

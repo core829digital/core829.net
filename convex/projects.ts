@@ -8,13 +8,14 @@ export const list = query({
     if (!args.token) return [];
     const user = await requireSession(ctx, args.token);
     if (user.role === "admin") {
-      return await ctx.db.query("projects").collect();
+      return await ctx.db.query("projects").order("desc").take(100);
     }
     if (!user._id) return [];
     return await ctx.db
       .query("projects")
       .withIndex("by_clientUserId", (q) => q.eq("clientUserId", user._id))
-      .collect();
+      .order("desc")
+      .take(50);
   },
 });
 
@@ -28,8 +29,8 @@ export const getByClient = query({
     if (user.role !== "admin" && client.userId !== user._id) return [];
     return await ctx.db
       .query("projects")
-      .filter((q) => q.eq(q.field("clientId"), args.clientId))
-      .collect();
+      .withIndex("by_clientId", (q) => q.eq("clientId", args.clientId))
+      .take(50);
   },
 });
 
@@ -133,8 +134,8 @@ export const getByUser = query({
     if (user.role !== "admin" && user._id !== args.userId) return [];
     return await ctx.db
       .query("projects")
-      .filter((q) => q.eq(q.field("clientUserId"), args.userId))
-      .collect();
+      .withIndex("by_clientUserId", (q) => q.eq("clientUserId", args.userId))
+      .take(50);
   },
 });
 

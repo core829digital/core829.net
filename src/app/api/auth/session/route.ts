@@ -11,8 +11,9 @@ function csrfCheck(request: Request): boolean {
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
   if (!origin && !referer) return false;
+  const isDev = process.env.NODE_ENV === "development";
   const known = [
-    "http://localhost:3000",
+    isDev ? "http://localhost:3000" : undefined,
     "https://localhost:3000",
     process.env.NEXT_PUBLIC_SITE_URL,
     process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : undefined,

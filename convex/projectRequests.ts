@@ -8,7 +8,7 @@ export const list = query({
   handler: async (ctx, args) => {
     if (!args.token) return [];
     await requireAdmin(ctx, args.token);
-    return await ctx.db.query("projectRequests").withIndex("by_createdAt").order("desc").collect();
+    return await ctx.db.query("projectRequests").withIndex("by_createdAt").order("desc").take(100);
   },
 });
 
@@ -21,7 +21,7 @@ export const getByUser = query({
     return await ctx.db
       .query("projectRequests")
       .filter((q) => q.eq(q.field("userId"), args.userId))
-      .collect();
+      .take(50);
   },
 });
 
@@ -62,10 +62,9 @@ export const updateStatus = mutation({
       v.literal("approved"),
       v.literal("declined")
     ),
-    token: v.optional(v.string()),
+    token: v.string(),
   },
   handler: async (ctx, args) => {
-    if (!args.token) throw new Error("Forbidden");
     await requireAdmin(ctx, args.token);
     await ctx.db.patch(args.id, {
       status: args.status,

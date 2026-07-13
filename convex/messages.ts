@@ -18,7 +18,7 @@ export const list = query({
     return await ctx.db
       .query("projectMessages")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
-      .collect();
+      .take(200);
   },
 });
 

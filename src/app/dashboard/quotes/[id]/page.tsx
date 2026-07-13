@@ -29,8 +29,8 @@ export default function QuoteDetailPage() {
     api.projects.getByUser,
     token && session ? { userId: session.userId, token } : "skip"
   ) ?? [];
+  const hasMultipleProjects = userProjects.length > 1;
   const project = userProjects.length === 1 ? userProjects[0] : null;
-  const ambiguousProject = userProjects.length > 1;
   const messages = useQuery(
     api.messages.list,
     token && project ? { projectId: project._id, token } : "skip"
@@ -212,7 +212,7 @@ export default function QuoteDetailPage() {
                   </div>
                 </div>
               )}
-            </div>
+          </div>
 
             {project && project.iban && (
               <div className="bg-graphite rounded-2xl border border-mist p-6 lg:p-8">
@@ -280,7 +280,16 @@ export default function QuoteDetailPage() {
           </div>
 
           <div className="lg:col-span-1">
-            {project && (
+            {!project && !hasMultipleProjects ? null : hasMultipleProjects ? (
+              <div className="bg-graphite rounded-2xl border border-mist p-6 lg:p-8 sticky top-32">
+                <span className="text-ink/40 font-mono text-xs uppercase tracking-wider">Progetti</span>
+                <h2 className="text-display text-xl mt-2 mb-4">Messaggi e documenti</h2>
+                <p className="text-sm text-ink/60">
+                  Visualizza i messaggi e i documenti dalla pagina del progetto nel tuo{" "}
+                  <Link href="/dashboard/projects" className="text-signal hover:underline">dashboard progetti</Link>.
+                </p>
+              </div>
+            ) : (
               <div className="bg-graphite rounded-2xl border border-mist p-6 lg:p-8 sticky top-32">
                 <span className="text-ink/40 font-mono text-xs uppercase tracking-wider">Messaggi</span>
                 <h2 className="text-display text-xl mt-2 mb-4">Conversazione</h2>

@@ -12,7 +12,7 @@ export const list = query({
     return await ctx.db
       .query("projectDocuments")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
-      .collect();
+      .take(100);
   },
 });
 
@@ -27,7 +27,7 @@ export const upload = mutation({
   },
   handler: async (ctx, args) => {
     await requireSession(ctx, args.token);
-    const { token: _, ...fields } = args;
+    const { token: _t, ...fields } = args;
     return await ctx.db.insert("projectDocuments", {
       ...fields,
       createdAt: Date.now(),
@@ -59,7 +59,7 @@ export const checkStorageAccess = query({
 
     const doc = await ctx.db
       .query("projectDocuments")
-      .filter((q) => q.eq(q.field("storageId"), args.storageId))
+      .withIndex("by_storageId", (q) => q.eq("storageId", args.storageId))
       .first();
     if (doc) {
       const project = await ctx.db.get(doc.projectId);
@@ -68,7 +68,7 @@ export const checkStorageAccess = query({
 
     const quote = await ctx.db
       .query("quotes")
-      .filter((q) => q.eq(q.field("pdfStorageId"), args.storageId))
+      .withIndex("by_pdfStorageId", (q) => q.eq("pdfStorageId", args.storageId))
       .first();
     if (quote) {
       return quote.userId === user._id;
