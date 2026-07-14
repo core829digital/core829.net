@@ -45,6 +45,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push("/login?redirect=/admin");
     return null;
   }
+  if (session === undefined || user === undefined) {
+    return (
+      <div className="pt-28 min-h-dvh bg-paper text-ink flex">
+        <aside className="w-56 shrink-0 border-r border-mist animate-pulse">
+          <div className="p-5 border-b border-mist">
+            <div className="h-3 w-16 bg-white/5 rounded-full" />
+          </div>
+          <div className="p-3 space-y-1">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+              <div key={i} className="h-10 w-full bg-white/5 rounded-xl" />
+            ))}
+          </div>
+        </aside>
+        <main className="flex-1 p-6 lg:p-8" />
+      </div>
+    );
+  }
 
   return (
     <div className="pt-28 min-h-dvh bg-paper text-ink flex">

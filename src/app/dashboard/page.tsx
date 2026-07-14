@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
+import { StatsSkeleton, CardSkeleton } from "@/components/ui/DashboardSkeleton";
 export default function DashboardPage() {
   const router = useRouter();
   const token = getSessionToken();
@@ -28,8 +29,19 @@ export default function DashboardPage() {
 
   if (session === undefined) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      <div className="space-y-8 animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-3 w-16 bg-white/5 rounded-full" />
+            <div className="h-8 w-72 bg-white/10 rounded-lg" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 w-28 bg-white/5 rounded-full" />
+            <div className="h-9 w-24 bg-white/5 rounded-full" />
+          </div>
+        </div>
+        <StatsSkeleton count={3} />
+        <CardSkeleton count={2} />
       </div>
     );
   }

@@ -95,7 +95,7 @@ export default function AdminLeads() {
               <p className="text-xs text-ink/30 mt-2 font-mono">ID: {lead._id}</p>
             </div>
             <div className="flex flex-col gap-2 shrink-0">
-                <select value={lead.status} onChange={(e) => updateStatus({ id: lead._id, status: e.target.value as any, token })}
+                <select value={lead.status} onChange={(e) => updateStatus({ id: lead._id, status: e.target.value as "new" | "contacted" | "qualified" | "converted" | "closed", token })}
                 className="bg-paper border border-mist rounded-xl px-3 py-1.5 text-xs font-mono text-ink/60 outline-none"
               >
                 {statuses.filter((s) => s !== "all").map((s) => <option key={s} value={s}>{s}</option>)}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
+import { ListSkeleton } from "@/components/ui/DashboardSkeleton";
 
 export default function ClientProjects() {
   const token = getSessionToken();
@@ -14,7 +15,18 @@ export default function ClientProjects() {
   ) ?? [];
 
   if (session === undefined) {
-    return <div className="flex items-center justify-center min-h-[60vh]"><p className="text-ink/60 font-mono text-sm">Loading...</p></div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2 animate-pulse">
+            <div className="h-3 w-16 bg-white/5 rounded-full" />
+            <div className="h-6 w-36 bg-white/10 rounded-lg" />
+          </div>
+          <div className="h-9 w-24 bg-white/5 animate-pulse rounded-xl" />
+        </div>
+        <ListSkeleton rows={3} />
+      </div>
+    );
   }
 
   return (

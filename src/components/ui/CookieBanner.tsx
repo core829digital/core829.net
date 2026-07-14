@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export function CookieBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const accepted = localStorage.getItem("cookie_consent");
-    if (!accepted) {
-      setVisible(true);
+  const [visible, setVisible] = useState(() => {
+    if (typeof window !== "undefined") {
+      return !localStorage.getItem("cookie_consent");
     }
-  }, []);
+    return false;
+  });
 
   function accept() {
     localStorage.setItem("cookie_consent", "accepted");

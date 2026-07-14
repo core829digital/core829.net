@@ -131,7 +131,7 @@ export default function ContactPage() {
       const phoneVal = form.phone || undefined;
       const phoneCodeVal = phoneVal ? form.phoneCountryCode : undefined;
       await submitContact({
-        userId: sessionUser?.userId ?? undefined,
+        userId: sessionUser?.userId as import("../../../convex/_generated/dataModel").Id<"users"> | undefined,
         name: form.name,
         email: form.email,
         company: form.company || undefined,

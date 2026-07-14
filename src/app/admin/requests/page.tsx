@@ -107,7 +107,7 @@ export default function AdminRequests() {
                 {req.description && <p className="text-sm text-ink/50 mt-2 bg-paper rounded-xl p-3">{req.description}</p>}
               </div>
               <div className="flex flex-col gap-2 shrink-0">
-                <select value={req.status} onChange={(e) => updateStatus({ id: req._id, status: e.target.value as any, token })}
+                <select value={req.status} onChange={(e) => updateStatus({ id: req._id, status: e.target.value as "new" | "reviewing" | "quoted" | "approved" | "declined", token })}
                   className="bg-paper border border-mist rounded-xl px-3 py-1.5 text-xs font-mono text-ink/60 outline-none"
                 >
                   {statuses.filter((s) => s !== "all").map((s) => <option key={s} value={s}>{s}</option>)}

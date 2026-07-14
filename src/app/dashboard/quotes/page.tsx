@@ -5,19 +5,25 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { getSessionToken } from "@/lib/cookie";
-import { useToast } from "@/components/ui/Toast";
+import { CardSkeleton } from "@/components/ui/DashboardSkeleton";
 
 export default function QuotesPage() {
   const router = useRouter();
-  const { toast } = useToast();
   const token = getSessionToken();
   const session = useQuery(api.auth.validateSession, token ? { token } : "skip");
   const quotes = useQuery(api.quotes.list, token ? { token } : "skip") ?? [];
 
   if (session === undefined) {
     return (
-      <div className="flex items-center justify-center py-40">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      <div className="max-w-[1440px] mx-auto px-6 py-8">
+        <div className="flex items-center justify-between mb-12 animate-pulse">
+          <div className="space-y-2">
+            <div className="h-3 w-16 bg-white/5 rounded-full" />
+            <div className="h-8 w-36 bg-white/10 rounded-lg" />
+          </div>
+          <div className="h-9 w-36 bg-white/5 rounded-full" />
+        </div>
+        <CardSkeleton count={4} />
       </div>
     );
   }

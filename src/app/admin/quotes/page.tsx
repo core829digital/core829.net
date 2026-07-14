@@ -39,7 +39,7 @@ export default function AdminQuotes() {
     }
     try {
       await createQuote({
-        userId: newUserId as any,
+        userId: newUserId as import("../../../../convex/_generated/dataModel").Id<"users">,
         title: newTitle,
         amount: newAmount ? parseFloat(newAmount) : undefined,
         currency: "EUR",
@@ -51,7 +51,7 @@ export default function AdminQuotes() {
 
   const handleSetPrice = async (quoteId: string, amount: number) => {
     try {
-      await updatePrice({ quoteId: quoteId as any, amount, token });
+      await updatePrice({ quoteId: quoteId as import("../../../../convex/_generated/dataModel").Id<"quotes">, amount, token });
       setPriceInputs((p) => ({ ...p, [quoteId]: "" }));
     } catch { toast("Failed to update price", "error"); }
   };
@@ -128,7 +128,7 @@ export default function AdminQuotes() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
-                  <select value={q.status} onChange={(e) => updateStatus({ quoteId: q._id, status: e.target.value as any, token })}
+                  <select value={q.status} onChange={(e) => updateStatus({ quoteId: q._id, status: e.target.value as "draft" | "sent" | "accepted" | "rejected", token })}
                     className="bg-paper border border-mist rounded-xl px-3 py-1.5 text-xs font-mono text-ink/60 outline-none"
                   >
                     <option value="draft">Draft</option>

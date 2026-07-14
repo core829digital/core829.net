@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+function detectLowPerf() {
+  if (typeof navigator !== "undefined" && "hardwareConcurrency" in navigator) {
+    return navigator.hardwareConcurrency <= 4;
+  }
+  return false;
+}
 
 export function Atmosphere() {
-  const [lowPerf, setLowPerf] = useState(false);
-
-  useEffect(() => {
-    if (typeof navigator !== "undefined" && "hardwareConcurrency" in navigator) {
-      if (navigator.hardwareConcurrency <= 4) {
-        setLowPerf(true);
-      }
-    }
-  }, []);
+  const [lowPerf] = useState(detectLowPerf);
 
   return (
     <div

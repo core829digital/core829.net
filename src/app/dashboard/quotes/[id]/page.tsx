@@ -51,8 +51,30 @@ export default function QuoteDetailPage() {
 
   if (session === undefined || quote === undefined) {
     return (
-      <div className="pt-40 min-h-dvh flex items-center justify-center bg-paper text-ink">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      <div className="pt-40 min-h-dvh bg-paper text-ink animate-pulse">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <div className="h-3 w-24 bg-white/5 rounded-full mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+              <div className="bg-graphite rounded-2xl border border-mist p-6 lg:p-8">
+                <div className="h-8 w-64 bg-white/10 rounded-lg mb-3" />
+                <div className="h-12 w-40 bg-white/10 rounded-lg mb-4" />
+                <div className="h-4 w-32 bg-white/5 rounded-full" />
+              </div>
+            </div>
+            <div className="lg:col-span-1">
+              <div className="bg-graphite rounded-2xl border border-mist p-6 lg:p-8 sticky top-32">
+                <div className="h-4 w-24 bg-white/5 rounded-full mb-3" />
+                <div className="h-6 w-32 bg-white/10 rounded-lg mb-4" />
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-16 w-full bg-white/5 rounded-xl" />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

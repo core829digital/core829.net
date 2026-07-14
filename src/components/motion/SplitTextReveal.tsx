@@ -59,8 +59,7 @@ export function SplitTextReveal({
   const TagName = Tag;
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <TagName ref={ref as any} className={className}>
+      <TagName ref={ref as unknown as React.Ref<HTMLDivElement>} className={className}>
       {children}
     </TagName>
   );

@@ -34,8 +34,19 @@ export default function ProfilePage() {
 
   if (session === undefined || user === undefined) {
     return (
-      <div className="flex items-center justify-center py-40">
-        <p className="text-ink/60 font-mono text-sm">Loading...</p>
+      <div className="max-w-[640px] mx-auto px-6 py-8 animate-pulse">
+        <div className="space-y-2 mb-12">
+          <div className="h-3 w-16 bg-white/5 rounded-full" />
+          <div className="h-8 w-32 bg-white/10 rounded-lg" />
+        </div>
+        <div className="space-y-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i}>
+              <div className="h-3 w-24 bg-white/5 rounded-full mb-2" />
+              <div className="h-12 w-full bg-white/5 rounded-2xl" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
