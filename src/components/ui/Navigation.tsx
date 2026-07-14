@@ -8,9 +8,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SERVICES } from "@/lib/brand";
 import { MagneticButton } from "../motion/MagneticButton";
-import { getSessionToken } from "@/lib/cookie";
 import { shouldSimplifyAnimations } from "@/lib/deviceCapability";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useSession } from "./AuthProvider";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,15 +24,8 @@ const NAV_ITEMS = [
 ];
 
 function useAuth() {
-  const [authed, setAuthed] = useState(false);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const token = getSessionToken();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (token && token.length >= 32) setAuthed(true);
-    setLoading(false);
-  }, []);
-  return { authed, loading };
+  const { token, loading } = useSession();
+  return { authed: token.length >= 32, loading };
 }
 
 export function Navigation() {

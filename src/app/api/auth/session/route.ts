@@ -48,13 +48,6 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: SESSION_MAX_AGE,
   });
-  response.cookies.set("session_token_client", body.token, {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE,
-  });
 
   return response;
 }
@@ -84,13 +77,6 @@ export async function DELETE(request: NextRequest) {
   const response = NextResponse.json({ success: true });
   response.cookies.set("session_token", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
-  response.cookies.set("session_token_client", "", {
-    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",

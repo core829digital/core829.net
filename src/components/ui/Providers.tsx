@@ -13,6 +13,7 @@ import { registerEasing } from "@/lib/easing";
 import { CustomCursor } from "./CustomCursor";
 import { PageTransitionLayer } from "../motion/PageTransitionLayer";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { AuthProvider } from "./AuthProvider";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, MotionPathPlugin, Draggable);
 
@@ -45,13 +46,15 @@ function GlobalSystems({ children }: { children: ReactNode }) {
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ConvexProvider client={convex}>
-      <ErrorBoundary>
-        <CustomCursor>
-          <GlobalSystems>
-            <PageTransitionLayer>{children}</PageTransitionLayer>
-          </GlobalSystems>
-        </CustomCursor>
-      </ErrorBoundary>
+      <AuthProvider>
+        <ErrorBoundary>
+          <CustomCursor>
+            <GlobalSystems>
+              <PageTransitionLayer>{children}</PageTransitionLayer>
+            </GlobalSystems>
+          </CustomCursor>
+        </ErrorBoundary>
+      </AuthProvider>
     </ConvexProvider>
   );
 }
