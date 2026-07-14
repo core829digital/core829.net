@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/ui/Navigation";
@@ -38,6 +38,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  other: {
+    "color-scheme": "dark",
+  },
+  alternates: {
+    canonical: "https://core829.net",
+  },
   twitter: {
     card: "summary_large_image",
     title: "Core829 — Build it. Rent it. Run it.",
@@ -48,6 +54,10 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
   },
   manifest: "/manifest",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({

@@ -10,6 +10,7 @@ import { SERVICES } from "@/lib/brand";
 import { MagneticButton } from "../motion/MagneticButton";
 import { getSessionToken } from "@/lib/cookie";
 import { shouldSimplifyAnimations } from "@/lib/deviceCapability";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,13 +41,14 @@ export function Navigation() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { authed, loading } = useAuth();
+  const prefersReduced = useReducedMotion();
 
   useEffect(() => {
     if (shouldSimplifyAnimations()) return;
     const nav = navRef.current;
     if (!nav) return;
 
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       start: "top -80px",
       end: "bottom -80px",
       onToggle: (self) => {
@@ -57,6 +59,10 @@ export function Navigation() {
         }
       },
     });
+
+    return () => {
+      st.kill();
+    };
   }, []);
 
   useEffect(() => {
@@ -175,16 +181,19 @@ export function Navigation() {
                   className="block h-[2px] w-full origin-center"
                   animate={menuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
                   style={{ backgroundColor: "currentColor" }}
+                  transition={prefersReduced ? { duration: 0 } : undefined}
                 />
                 <motion.span
                   className="block h-[2px] w-full"
                   animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
                   style={{ backgroundColor: "currentColor" }}
+                  transition={prefersReduced ? { duration: 0 } : undefined}
                 />
                 <motion.span
                   className="block h-[2px] w-full origin-center"
                   animate={menuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
                   style={{ backgroundColor: "currentColor" }}
+                  transition={prefersReduced ? { duration: 0 } : undefined}
                 />
               </div>
             </button>

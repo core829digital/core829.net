@@ -9,12 +9,7 @@ export function SectionDivider({ variant = "wave" }: { variant?: "wave" | "dot" 
             stroke="var(--color-signal)"
             strokeWidth="0.5"
             opacity="0.06"
-          >
-            <animate attributeName="d"
-              values="M0,32 Q180,0 360,32 T720,32 T1080,32 T1440,32;M0,32 Q180,64 360,32 T720,32 T1080,32 T1440,32;M0,32 Q180,0 360,32 T720,32 T1080,32 T1440,32"
-              dur="6s" repeatCount="indefinite"
-            />
-          </path>
+          />
         </svg>
       </div>
     );

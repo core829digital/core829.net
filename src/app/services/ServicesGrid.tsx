@@ -10,7 +10,7 @@ export function ServicesGrid() {
     <div className="grid-12 gap-y-12">
       {SERVICES.map((service, i) => (
         <ScrollReveal key={service.id} variant="fade-up" delay={i * 0.06} className="col-span-12 md:col-span-4">
-          <Link href={`/services/${service.slug}`} className="block h-full">
+          <Link href={`/services/${service.slug}`} className="group block h-full">
             <InteractiveCard className="p-8 border border-mist hover:border-signal/20 hover:bg-white/5 transition-colors h-full">
               <span className="font-mono text-signal text-lg">{service.numeral}</span>
               <h2 className="text-display text-2xl mt-4 group-hover:text-signal transition-colors">

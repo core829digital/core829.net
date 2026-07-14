@@ -27,12 +27,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const toast = useCallback((message: string, type: ToastType = "info") => {
     counterRef.current += 1;
     const id = counterRef.current;
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type }].slice(-5));
   }, []);
 
-  const remove = (id: number) => {
+  const remove = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
+  }, []);
 
   return (
     <Ctx.Provider value={{ toast }}>
@@ -65,7 +65,7 @@ function ToastItem({ toast, onDone }: { toast: Toast; onDone: (id: number) => vo
 
   return (
     <div
-      className={`pointer-events-auto px-4 py-3 rounded-xl border backdrop-blur-md text-sm font-mono shadow-lg animate-in slide-in-from-right ${colors[toast.type]}`}
+      className={`pointer-events-auto px-4 py-3 rounded-xl border backdrop-blur-md text-sm font-mono shadow-lg animate-toast-in ${colors[toast.type]}`}
     >
       {toast.message}
     </div>

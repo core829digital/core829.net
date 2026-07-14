@@ -29,6 +29,7 @@ export function CustomCursor({ children }: { children: React.ReactNode }) {
   const isFineRef = useRef(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -39,9 +40,9 @@ export function CustomCursor({ children }: { children: React.ReactNode }) {
 
       const configs: Record<string, gsap.TweenVars> = {
         default: { scale: 1, background: "transparent", borderColor: "rgba(250,250,250,0.2)" },
-        link: { scale: 1.6, background: "rgba(225,6,0,0.12)", borderColor: "var(--color-signal)" },
-        view: { scale: 2.4, background: "rgba(225,6,0,0.1)", borderColor: "var(--color-signal)" },
-        drag: { scale: 2.0, background: "rgba(250,250,250,0.06)", borderColor: "var(--color-ink)" },
+        link: { scale: 1.6, background: "rgba(225,6,0,0.12)", borderColor: "#e10600" },
+        view: { scale: 2.4, background: "rgba(225,6,0,0.1)", borderColor: "#e10600" },
+        drag: { scale: 2.0, background: "rgba(250,250,250,0.06)", borderColor: "#fafafa" },
       };
 
       gsap.to(ringRef.current, {
