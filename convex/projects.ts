@@ -72,7 +72,10 @@ export const updateStatus = mutation({
     token: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.token);
+    const user = await requireSession(ctx, args.token);
+    const project = await ctx.db.get(args.id);
+    if (!project) throw new Error("Project not found");
+    if (user.role !== "admin" && project.clientUserId !== user._id) throw new Error("Forbidden");
     await ctx.db.patch(args.id, { status: args.status });
   },
 });
@@ -118,7 +121,7 @@ export const addTimelineEvent = mutation({
     token: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.token);
+    await requireAdmin(ctx, args.token);
     const project = await ctx.db.get(args.projectId);
     if (!project) throw new Error("Project not found");
     await ctx.db.patch(args.projectId, {
@@ -172,7 +175,7 @@ export const updateProject = mutation({
   },
   handler: async (ctx, args) => {
     const { projectId, token, ...fields } = args;
-    await requireSession(ctx, token);
+    await requireAdmin(ctx, token);
     const patch: Record<string, unknown> = {};
     if (fields.price !== undefined) patch.price = fields.price;
     if (fields.currency !== undefined) patch.currency = fields.currency;

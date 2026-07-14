@@ -3,7 +3,7 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
 import type { ActionCtx } from "./_generated/server";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { contactSubmitSchema } from "./validation";
 
 export const submit = action({
@@ -28,7 +28,7 @@ export const submit = action({
     const data = parsed.data;
 
     const rateKey = `contact:${data.email.toLowerCase()}`;
-    const limits = await ctx.runQuery(api.auth.getRateLimits, { key: rateKey });
+    const limits = await ctx.runQuery(internal.auth.getRateLimits, { key: rateKey });
     if (limits.length > 0) {
       const entry = limits[0];
       if (entry.blockedUntil && entry.blockedUntil > Date.now()) {
@@ -38,7 +38,7 @@ export const submit = action({
         throw new Error("Too many messages. Please try again later.");
       }
     }
-    await ctx.runMutation(api.auth.recordFailedAttempt, { key: rateKey });
+    await ctx.runMutation(internal.auth.recordFailedAttempt, { key: rateKey });
 
     await ctx.runMutation(api.leads.create, {
       name: data.name,

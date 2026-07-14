@@ -22,23 +22,31 @@ export const upload = mutation({
     title: v.string(),
     description: v.optional(v.string()),
     storageId: v.string(),
-    uploadedBy: v.id("users"),
     token: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.token);
-    const { token: _t, ...fields } = args;
+    const caller = await requireSession(ctx, args.token);
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+    if (caller.role !== "admin" && project.clientUserId !== caller._id) throw new Error("Forbidden");
     return await ctx.db.insert("projectDocuments", {
-      ...fields,
+      projectId: args.projectId,
+      title: args.title,
+      description: args.description,
+      storageId: args.storageId,
+      uploadedBy: caller._id,
       createdAt: Date.now(),
     });
   },
 });
 
 export const generateUploadUrl = mutation({
-  args: { token: v.string() },
+  args: { projectId: v.id("projects"), token: v.string() },
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.token);
+    const caller = await requireSession(ctx, args.token);
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+    if (caller.role !== "admin" && project.clientUserId !== caller._id) throw new Error("Forbidden");
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -46,7 +54,12 @@ export const generateUploadUrl = mutation({
 export const remove = mutation({
   args: { id: v.id("projectDocuments"), token: v.string() },
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.token);
+    const user = await requireSession(ctx, args.token);
+    const doc = await ctx.db.get(args.id);
+    if (!doc) throw new Error("Document not found");
+    const project = await ctx.db.get(doc.projectId);
+    if (!project) throw new Error("Project not found");
+    if (user.role !== "admin" && project.clientUserId !== user._id) throw new Error("Forbidden");
     await ctx.db.delete(args.id);
   },
 });

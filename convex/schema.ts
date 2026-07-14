@@ -81,7 +81,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_status", ["status"])
-    .index("by_createdAt", ["createdAt"]),
+    .index("by_createdAt", ["createdAt"])
+    .index("by_userId", ["userId"]),
 
   rentableApps: defineTable({
     name: v.string(),

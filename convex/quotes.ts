@@ -7,12 +7,13 @@ export const list = query({
   handler: async (ctx, args) => {
     const user = await requireSession(ctx, args.token);
     if (user.role === "admin") {
-      return await ctx.db.query("quotes").collect();
+      return await ctx.db.query("quotes").order("desc").take(200);
     }
     return await ctx.db
       .query("quotes")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .collect();
+      .order("desc")
+      .take(200);
   },
 });
 

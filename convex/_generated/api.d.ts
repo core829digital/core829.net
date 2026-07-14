@@ -13,6 +13,7 @@ import type * as authHelpers from "../authHelpers.js";
 import type * as auth_actions from "../auth_actions.js";
 import type * as caseStudies from "../caseStudies.js";
 import type * as contact from "../contact.js";
+import type * as crons from "../crons.js";
 import type * as documents from "../documents.js";
 import type * as leads from "../leads.js";
 import type * as messages from "../messages.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   auth_actions: typeof auth_actions;
   caseStudies: typeof caseStudies;
   contact: typeof contact;
+  crons: typeof crons;
   documents: typeof documents;
   leads: typeof leads;
   messages: typeof messages;

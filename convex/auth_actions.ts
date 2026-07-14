@@ -3,7 +3,7 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
 import type { ActionCtx } from "./_generated/server";
-import { api, internal } from "./_generated/api";
+import { internal } from "./_generated/api";
 import crypto from "crypto";
 import { signupSchema, loginSchema, passwordResetSchema, confirmResetSchema } from "./validation";
 
@@ -65,19 +65,19 @@ export const signup = action({
     if (!parsed.success) throw new Error(parsed.error.issues[0].message);
 
     const key = `signup:${parsed.data.email}`;
-    const limits = await callQuery(ctx, api.auth.getRateLimits, { key });
+    const limits = await callQuery(ctx, internal.auth.getRateLimits, { key });
     if (limits.length > 0 && limits[0].attempts >= 3) {
       throw new Error("Too many attempts. Try again later.");
     }
 
     const existing = await callQuery(ctx, internal.auth.getUserByEmail, { email: parsed.data.email });
     if (existing) {
-      await callMutation(ctx, api.auth.recordFailedAttempt, { key });
+      await callMutation(ctx, internal.auth.recordFailedAttempt, { key });
       throw new Error("Email already registered");
     }
 
     const passwordHash = await hashPassword(parsed.data.password);
-    const userId = await callMutation(ctx, api.auth.createUser, {
+    const userId = await callMutation(ctx, internal.auth.createUser, {
       email: parsed.data.email,
       passwordHash,
       name: parsed.data.name,
@@ -85,7 +85,7 @@ export const signup = action({
     });
 
     const token = generateToken();
-    await callMutation(ctx, api.auth.createSession, {
+    await callMutation(ctx, internal.auth.createSession, {
       userId,
       token,
       expiresAt: Date.now() + SESSION_DURATION_MS,
@@ -102,7 +102,7 @@ export const login = action({
     if (!parsed.success) throw new Error("Invalid email or password");
 
     const key = `login:${parsed.data.email}`;
-    const limits = await callQuery(ctx, api.auth.getRateLimits, { key });
+    const limits = await callQuery(ctx, internal.auth.getRateLimits, { key });
 
     if (limits.length > 0) {
       const e = limits[0];
@@ -116,27 +116,27 @@ export const login = action({
       email: parsed.data.email,
     });
     if (!user) {
-      await callMutation(ctx, api.auth.recordFailedAttempt, { key });
+      await callMutation(ctx, internal.auth.recordFailedAttempt, { key });
       throw new Error("Invalid email or password");
     }
 
     const result = await verifyAndUpgradeHash(user.passwordHash, parsed.data.password);
     if (!result.ok) {
-      await callMutation(ctx, api.auth.recordFailedAttempt, { key });
+      await callMutation(ctx, internal.auth.recordFailedAttempt, { key });
       throw new Error("Invalid email or password");
     }
 
     if (result.newHash) {
-      await callMutation(ctx, api.auth.updatePassword, {
+      await callMutation(ctx, internal.auth.updatePassword, {
         email: parsed.data.email,
         passwordHash: result.newHash,
       });
     }
 
-    await callMutation(ctx, api.auth.clearRateLimit, { key });
+    await callMutation(ctx, internal.auth.clearRateLimit, { key });
 
     const token = generateToken();
-    await callMutation(ctx, api.auth.createSession, {
+    await callMutation(ctx, internal.auth.createSession, {
       userId: user._id,
       token,
       expiresAt: Date.now() + SESSION_DURATION_MS,
@@ -153,7 +153,7 @@ export const requestPasswordReset = action({
     if (!parsed.success) return { success: true };
 
     const key = `reset:${parsed.data.email.toLowerCase()}`;
-    const limits = await callQuery(ctx, api.auth.getRateLimits, { key });
+    const limits = await callQuery(ctx, internal.auth.getRateLimits, { key });
     if (limits.length > 0) {
       const e = limits[0];
       if (e.blockedUntil && e.blockedUntil > Date.now()) {
@@ -163,7 +163,7 @@ export const requestPasswordReset = action({
         return { success: true };
       }
     }
-    await callMutation(ctx, api.auth.recordFailedAttempt, { key });
+    await callMutation(ctx, internal.auth.recordFailedAttempt, { key });
 
     const user = await callQuery(ctx, internal.auth.getUserByEmail, {
       email: parsed.data.email,
@@ -171,7 +171,7 @@ export const requestPasswordReset = action({
     if (!user) return { success: true };
 
     const token = generateToken();
-    await callMutation(ctx, api.auth.createPasswordResetToken, {
+    await callMutation(ctx, internal.auth.createPasswordResetToken, {
       email: parsed.data.email,
       token,
       expiresAt: Date.now() + 3600000,
@@ -201,12 +201,12 @@ export const confirmPasswordReset = action({
     const parsed = confirmResetSchema.safeParse(args);
     if (!parsed.success) throw new Error(parsed.error.issues[0].message);
 
-    const { email } = await callMutation(ctx, api.auth.consumePasswordResetToken, {
+    const { email } = await callMutation(ctx, internal.auth.consumePasswordResetToken, {
       token: parsed.data.token,
     });
 
     const passwordHash = await hashPassword(parsed.data.newPassword);
-    await callMutation(ctx, api.auth.updatePassword, {
+    await callMutation(ctx, internal.auth.updatePassword, {
       email,
       passwordHash,
     });

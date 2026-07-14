@@ -12,7 +12,7 @@ export const getUserByEmail = internalQuery({
   },
 });
 
-export const createUser = mutation({
+export const createUser = internalMutation({
   args: {
     email: v.string(),
     passwordHash: v.string(),
@@ -30,7 +30,7 @@ export const createUser = mutation({
   },
 });
 
-export const createSession = mutation({
+export const createSession = internalMutation({
   args: {
     userId: v.id("users"),
     token: v.string(),
@@ -77,7 +77,7 @@ export const validateSession = query({
   },
 });
 
-export const getRateLimits = query({
+export const getRateLimits = internalQuery({
   args: { key: v.string() },
   handler: async (ctx, args) => {
     const result = await ctx.db
@@ -88,7 +88,7 @@ export const getRateLimits = query({
   },
 });
 
-export const recordFailedAttempt = mutation({
+export const recordFailedAttempt = internalMutation({
   args: { key: v.string() },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -120,7 +120,7 @@ export const recordFailedAttempt = mutation({
   },
 });
 
-export const clearRateLimit = mutation({
+export const clearRateLimit = internalMutation({
   args: { key: v.string() },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -146,7 +146,7 @@ export const cleanExpiredSessions = internalMutation({
   },
 });
 
-export const createPasswordResetToken = mutation({
+export const createPasswordResetToken = internalMutation({
   args: { email: v.string(), token: v.string(), expiresAt: v.number() },
   handler: async (ctx, args) => {
     await ctx.db.insert("passwordResetTokens", {
@@ -158,7 +158,7 @@ export const createPasswordResetToken = mutation({
   },
 });
 
-export const consumePasswordResetToken = mutation({
+export const consumePasswordResetToken = internalMutation({
   args: { token: v.string() },
   handler: async (ctx, args) => {
     const entry = await ctx.db
@@ -173,7 +173,7 @@ export const consumePasswordResetToken = mutation({
   },
 });
 
-export const updatePassword = mutation({
+export const updatePassword = internalMutation({
   args: { email: v.string(), passwordHash: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db
@@ -203,7 +203,7 @@ export const list = query({
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.token);
     const users = await ctx.db.query("users").take(200);
-    return users.map(({ passwordHash: _hash, ...rest }) => rest);
+    return users.map(({ passwordHash: _passwordHash, ...rest }) => rest);
   },
 });
 

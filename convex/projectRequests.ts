@@ -20,7 +20,7 @@ export const getByUser = query({
     if (user.role !== "admin" && user._id !== args.userId) return [];
     return await ctx.db
       .query("projectRequests")
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .take(50);
   },
 });

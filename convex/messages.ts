@@ -60,7 +60,8 @@ export const send = mutation({
 export const remove = mutation({
   args: { messageId: v.id("projectMessages"), token: v.string() },
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.token);
+    const user = await requireSession(ctx, args.token);
+    if (user.role !== "admin") throw new Error("Forbidden");
     await ctx.db.delete(args.messageId);
   },
 });

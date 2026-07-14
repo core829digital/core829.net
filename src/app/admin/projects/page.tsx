@@ -12,7 +12,7 @@ export default function AdminProjects() {
   const token = getSessionToken();
   const convex = useConvex();
   const projects = useQuery(api.projects.list, token ? { token } : "skip");
-  const teamMembers = useQuery(api.teamMembers.list, token ? { token } : "skip");
+
   const users = useQuery(api.auth.list, token ? { token } : "skip");
   const updateProject = useMutation(api.projects.updateProject);
   const addTimeline = useMutation(api.projects.addTimelineEvent);
@@ -50,12 +50,11 @@ export default function AdminProjects() {
     if (!docFile || !docTitle || !selectedId) return;
     setUploading(true);
     try {
-      const uploadUrl = await genUpload({ token });
+      const uploadUrl = await genUpload({ projectId: selectedId as unknown as import("../../../../convex/_generated/dataModel").Id<"projects">, token });
       await fetch(uploadUrl, { method: "PUT", body: docFile });
       const storageId = new URL(uploadUrl).pathname.split("/").pop()?.split("?")[0];
-      const session = await convex.query(api.auth.validateSession, { token });
-      if (!session || !storageId) { setUploading(false); return; }
-      await uploadDoc({ projectId: selectedId as any, title: docTitle, storageId, uploadedBy: session.userId as any, token });
+      if (!storageId) { setUploading(false); return; }
+      await uploadDoc({ projectId: selectedId as unknown as import("../../../../convex/_generated/dataModel").Id<"projects">, title: docTitle, storageId, token });
       setDocTitle(""); setDocFile(null);
       if (fileRef.current) fileRef.current.value = "";
     } catch { toast("Failed to upload document", "error"); }
@@ -67,7 +66,7 @@ export default function AdminProjects() {
     const session = await convex.query(api.auth.validateSession, { token });
     if (!session) return;
     try {
-      await sendMessage({ projectId: selectedId as any, senderId: session.userId as any, senderRole: "admin", content: msgInput.trim(), token });
+      await sendMessage({ projectId: selectedId as unknown as import("../../../../convex/_generated/dataModel").Id<"projects">, senderId: session.userId as unknown as import("../../../../convex/_generated/dataModel").Id<"users">, senderRole: "admin", content: msgInput.trim(), token });
       setMsgInput("");
     } catch { toast("Failed to send message", "error"); }
   };
@@ -75,7 +74,7 @@ export default function AdminProjects() {
   const handleAddTimeline = async () => {
     if (!timelineInput.trim() || !selectedId) return;
     try {
-      await addTimeline({ projectId: selectedId as any, event: timelineInput.trim(), token });
+      await addTimeline({ projectId: selectedId as unknown as import("../../../../convex/_generated/dataModel").Id<"projects">, event: timelineInput.trim(), token });
       setTimelineInput("");
     } catch { toast("Failed to add timeline event", "error"); }
   };
@@ -88,14 +87,14 @@ export default function AdminProjects() {
       return;
     }
     try {
-      await updateProject({ projectId: selectedId as any, token, price: n });
+      await updateProject({ projectId: selectedId as unknown as import("../../../../convex/_generated/dataModel").Id<"projects">, token, price: n });
     } catch { toast("Failed to save price", "error"); }
   };
 
   const handleSaveField = async (field: "iban" | "stage" | "status", value: string) => {
     if (!selectedId) return;
     try {
-      await updateProject({ projectId: selectedId as any, token, [field]: value } as any);
+      await updateProject({ projectId: selectedId as unknown as import("../../../../convex/_generated/dataModel").Id<"projects">, token, [field]: value });
     } catch { toast("Failed to save", "error"); }
   };
 

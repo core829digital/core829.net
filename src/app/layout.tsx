@@ -41,9 +41,6 @@ export const metadata: Metadata = {
   other: {
     "color-scheme": "dark",
   },
-  alternates: {
-    canonical: "https://core829.net",
-  },
   twitter: {
     card: "summary_large_image",
     title: "Core829 — Build it. Rent it. Run it.",

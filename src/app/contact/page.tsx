@@ -72,13 +72,15 @@ export default function ContactPage() {
     if (token) {
       convex.query(api.auth.validateSession, { token }).then((session) => {
         if (session) {
-          setSessionUser(session as any);
+          setSessionUser(session);
           setForm((f) => ({
             ...f,
             name: session.name,
             email: session.email,
           }));
         }
+      }).catch(() => {
+        // Session validation failed silently — user not logged in
       });
     }
   }, [convex]);
@@ -129,13 +131,13 @@ export default function ContactPage() {
       const phoneVal = form.phone || undefined;
       const phoneCodeVal = phoneVal ? form.phoneCountryCode : undefined;
       await submitContact({
-        userId: sessionUser?.userId as any,
+        userId: sessionUser?.userId ?? undefined,
         name: form.name,
         email: form.email,
         company: form.company || undefined,
         phone: phoneVal,
         phoneCountryCode: phoneCodeVal,
-        clientType: (form.clientType || undefined) as any,
+        clientType: (form.clientType || undefined) as "company" | "private" | undefined,
         serviceInterest: form.serviceInterest,
         budget: form.budget || undefined,
         timeline: form.timeline || undefined,
