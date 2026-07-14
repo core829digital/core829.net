@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-eval' 'unsafe-inline' 'strict-dynamic' https://*.convex.cloud https://vercel.live https://va.vercel-scripts.com",
+  "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.convex.cloud https://vercel.live https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data: https://*.convex.cloud",
   "font-src 'self' https://fonts.gstatic.com",
