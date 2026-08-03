@@ -77,8 +77,6 @@ export function SiteWideFlowMap() {
       tl.to(cometRef.current, {
         motionPath: {
           path: COMET_PATH,
-          align: COMET_PATH,
-          alignOrigin: [0.5, 0.5],
           autoRotate: 90,
         },
         duration: 1,
