@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+/* Saans (Displaay) e' un font commerciale: se e' installato sul dispositivo viene usato direttamente,
+   altrimenti si usa Inter (self-hosted da next/font). Configurazione identica ad Andromedia Web. */
+@font-face {
+  font-family: "Saans";
+  src: local("Saans"), local("Saans Regular"), local("Saans-Regular");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Saans Display";
+  src:
+    local("Saans Display"), local("SaansDisplay-Regular"),
+    local("Saans Display Regular"), local("Saans");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Saans Text";
+  src:
+    local("Saans Text"), local("SaansText-Regular"),
+    local("Saans Text Regular"), local("Saans");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-ink: #fafafa;
   --color-paper: #0a0a0a;
@@ -8,9 +36,16 @@
   --color-graphite: #1a1a1a;
   --color-mist: #2a2a2a;
   --color-ghost: rgba(250, 250, 250, 0.04);
-  --font-display: "Geist Display", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Geist Mono", monospace;
+  --font-display:
+    "Saans Display", "Saans", var(--font-inter), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-body:
+    "Saans Text", "Saans", var(--font-inter), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans:
+    "Saans Text", "Saans", var(--font-inter), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 @layer base {
@@ -83,6 +118,16 @@
     .section-padding {
       padding: 48px 0;
     }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 560; /* come Andromedia Web */
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
   .text-display {
